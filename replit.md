@@ -18,7 +18,9 @@ This is a payment tracking and installment management system for online schools.
 
 ## Current Setup
 The application is running with **full backend integration**:
-- PostgreSQL database (Replit-hosted)
+- PostgreSQL database (External server: 194.87.215.84)
+  - Database: `data_vrassrochki`
+  - Schema: `payment_tracking` (isolated from other projects)
 - Node.js/Express backend API (port 3001)
 - Real-time data persistence
 - JWT authentication
@@ -43,7 +45,10 @@ The app will start on **port 5000** and appear in the Webview panel.
 **Backend:**
 - **Workflow**: Backend (runs `cd src/backend-example && node server.js`)
 - **Port**: 3001 (internal, accessed via Vite proxy)
-- **Database**: PostgreSQL (Replit-hosted)
+- **Database**: PostgreSQL (External server)
+  - Host: 194.87.215.84:5432
+  - Database: data_vrassrochki
+  - Schema: payment_tracking (isolated)
 - **API Endpoint**: `/api` (proxied from frontend)
 
 ### Stopping/Restarting
@@ -76,10 +81,11 @@ The backend is **already configured** and running:
 **Password:** Set during setup
 
 ### How It Works
-- Frontend (port 5000) → Vite proxy → Backend (port 3001) → PostgreSQL
+- Frontend (port 5000) → Vite proxy → Backend (port 3001) → External PostgreSQL
 - Authentication via JWT tokens
 - All API requests go through `/api` endpoint
-- Automatic database connection using Replit environment variables
+- Database connection using external PostgreSQL server
+- All data stored in dedicated `payment_tracking` schema for project isolation
 
 See `src/backend-example/README.md` for API documentation.
 
@@ -96,17 +102,19 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
-- **2025-11-18**: Full stack setup completed
+- **2025-11-18**: Full stack setup with external PostgreSQL completed
   - ✅ Configured Vite for Replit (port 5000, host 0.0.0.0, allowedHosts)
   - ✅ Created Frontend workflow
-  - ✅ Created PostgreSQL database (Replit-hosted)
+  - ✅ Connected to external PostgreSQL server (194.87.215.84)
+  - ✅ Created dedicated schema `payment_tracking` for project isolation
   - ✅ Configured Backend workflow (port 3001)
-  - ✅ Initialized database schema (5 tables)
-  - ✅ Created Architect user account
+  - ✅ Initialized database schema (5 tables in payment_tracking schema)
+  - ✅ Updated all SQL queries to use schema-qualified table names
+  - ✅ Created Architect user account (sochneva.anastasiya@gmail.com)
   - ✅ Configured Vite proxy for API routing
   - ✅ Updated env.ts for development mode detection
   - ✅ Added TypeScript definitions for Vite environment
-  - ✅ Verified full stack integration (frontend ↔ backend ↔ database)
+  - ✅ Verified full stack integration (frontend ↔ backend ↔ external database)
 
 ## Project Status
 ✅ Frontend running (React + Vite)

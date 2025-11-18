@@ -25,6 +25,11 @@ async function initDatabase() {
     await client.query(`CREATE SCHEMA IF NOT EXISTS ${SCHEMA};`);
     console.log(`✅ Схема ${SCHEMA} создана`);
     
+    // Создаем расширение pgcrypto для gen_random_uuid()
+    console.log('🔧 Проверка расширения pgcrypto...');
+    await client.query(`CREATE EXTENSION IF NOT EXISTS pgcrypto;`);
+    console.log('✅ Расширение pgcrypto готово');
+    
     console.log('🔧 Создание таблиц...');
 
     // Создаем таблицу schools

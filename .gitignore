@@ -45,3 +45,7 @@ coverage/
 # Optional
 .eslintcache
 .stylelintcache
+
+# Backend sensitive files
+src/backend-example/.env
+src/backend-example/create-architect.js

@@ -6,6 +6,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const pgFormat = require('pg-format');
 require('dotenv').config();
 
 const app = express();
@@ -32,6 +33,22 @@ const SCHEMA = process.env.POSTGRESQL_SCHEMA || 'public';
 
 // Функция для добавления схемы к имени таблицы
 const table = (name) => `${SCHEMA}.${name}`;
+
+// Установить search_path для всех подключений к использованию нашей схемы
+pool.on('connect', (client) => {
+  // Безопасно экранируем schema identifier с помощью pg-format.ident для защиты от injection
+  const safeSchema = pgFormat.ident(SCHEMA);
+  client.query(`SET search_path TO ${safeSchema}, public;`).catch(err => {
+    console.error('Failed to set search_path:', err);
+  });
+});
+
+// Проверка search_path при старте сервера
+pool.query('SHOW search_path').then(result => {
+  console.log('🔍 Current search_path:', result.rows[0].search_path);
+}).catch(err => {
+  console.error('Failed to check search_path:', err);
+});
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-this';
 
@@ -62,7 +79,7 @@ app.post('/api/auth/register', async (req, res) => {
   try {
     // Проверяем, существует ли пользователь
     const existingUser = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
+      `SELECT * FROM ${table('users')} WHERE email = $1`,
       [email]
     );
 
@@ -75,14 +92,14 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Создаем школу
     const schoolResult = await pool.query(
-      'INSERT INTO schools (name) VALUES ($1) RETURNING *',
+      `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *',
       [schoolName]
     );
     const school = schoolResult.rows[0];
 
     // Создаем пользователя-администратора
     const userResult = await pool.query(
-      'INSERT INTO users (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id',
+      `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id',
       [email, hashedPassword, name, 'admin', school.id]
     );
     const user = userResult.rows[0];
@@ -122,7 +139,7 @@ app.post('/api/auth/login', async (req, res) => {
   try {
     // Находим пользователя
     const result = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
+      `SELECT * FROM ${table('users')} WHERE email = $1`,
       [email]
     );
 
@@ -149,7 +166,7 @@ app.post('/api/auth/login', async (req, res) => {
     let school = null;
     if (user.school_id) {
       const schoolResult = await pool.query(
-        'SELECT * FROM schools WHERE id = $1',
+        `SELECT * FROM ${table('schools')} WHERE id = $1`,
         [user.school_id]
       );
       if (schoolResult.rows.length > 0) {
@@ -230,7 +247,7 @@ app.get('/api/schools/:schoolId', authenticateToken, async (req, res) => {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
 
-    const result = await pool.query('SELECT * FROM schools WHERE id = $1', [schoolId]);
+    const result = await pool.query(`SELECT * FROM ${table('schools')} WHERE id = $1`, [schoolId]);
     
     if (result.rows.length === 0) {
       return res.status(404).json({ message: 'Школа не найдена' });
@@ -255,7 +272,7 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
 
     // Проверяем, существует ли администратор с таким email
     const existingUser = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
+      `SELECT * FROM ${table('users')} WHERE email = $1`,
       [adminEmail]
     );
 
@@ -268,7 +285,7 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
     try {
       // Создаем школу
       const schoolResult = await pool.query(
-        'INSERT INTO schools (name) VALUES ($1) RETURNING *',
+        `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *',
         [schoolName]
       );
       const school = schoolResult.rows[0];
@@ -278,7 +295,7 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
 
       // Создаем администратора школы
       const adminResult = await pool.query(
-        'INSERT INTO users (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id',
+        `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id',
         [adminEmail, hashedPassword, adminName, 'admin', school.id]
       );
       const admin = adminResult.rows[0];
@@ -324,7 +341,7 @@ app.put('/api/schools/:schoolId', authenticateToken, async (req, res) => {
 
     // Проверяем, существует ли школа
     const schoolResult = await pool.query(
-      'SELECT * FROM schools WHERE id = $1',
+      `SELECT * FROM ${table('schools')} WHERE id = $1`,
       [schoolId]
     );
 
@@ -334,7 +351,7 @@ app.put('/api/schools/:schoolId', authenticateToken, async (req, res) => {
 
     // Находим администратора школы
     const adminResult = await pool.query(
-      'SELECT * FROM users WHERE school_id = $1 AND role = $2',
+      `SELECT * FROM ${table('users')} WHERE school_id = $1 AND role = $2`,
       [schoolId, 'admin']
     );
 
@@ -347,7 +364,7 @@ app.put('/api/schools/:schoolId', authenticateToken, async (req, res) => {
     // Если email изменился, проверяем что новый email не занят
     if (adminEmail && adminEmail !== admin.email) {
       const existingUser = await pool.query(
-        'SELECT * FROM users WHERE email = $1 AND id != $2',
+        `SELECT * FROM ${table('users')} WHERE email = $1 AND id != $2`,
         [adminEmail, admin.id]
       );
 
@@ -421,7 +438,7 @@ app.delete('/api/schools/:schoolId', authenticateToken, async (req, res) => {
 
     // Проверяем, существует ли школа
     const schoolResult = await pool.query(
-      'SELECT * FROM schools WHERE id = $1',
+      `SELECT * FROM ${table('schools')} WHERE id = $1`,
       [schoolId]
     );
 
@@ -433,13 +450,13 @@ app.delete('/api/schools/:schoolId', authenticateToken, async (req, res) => {
 
     try {
       // Удаляем всех клиентов школы (каскадное удаление платежей и истории просрочек)
-      await pool.query('DELETE FROM clients WHERE school_id = $1', [schoolId]);
+      await pool.query(`DELETE FROM ${table('clients')} WHERE school_id = $1`, [schoolId]);
 
       // Удаляем всех пользователей школы
-      await pool.query('DELETE FROM users WHERE school_id = $1', [schoolId]);
+      await pool.query(`DELETE FROM ${table('users')} WHERE school_id = $1`, [schoolId]);
 
       // Удаляем школу
-      await pool.query('DELETE FROM schools WHERE id = $1', [schoolId]);
+      await pool.query(`DELETE FROM ${table('schools')} WHERE id = $1`, [schoolId]);
 
       await pool.query('COMMIT');
 
@@ -467,7 +484,7 @@ app.get('/api/schools/:schoolId/clients', authenticateToken, async (req, res) =>
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
 
-    let query = 'SELECT * FROM clients WHERE school_id = $1';
+    let query = `SELECT * FROM ${table('clients')} WHERE school_id = $1`;
     const params = [schoolId];
 
     // Фильтр по менеджеру
@@ -484,13 +501,13 @@ app.get('/api/schools/:schoolId/clients', authenticateToken, async (req, res) =>
     // Загружаем платежи и историю для каждого клиента
     for (let client of clients) {
       const paymentsResult = await pool.query(
-        'SELECT * FROM payments WHERE client_id = $1 ORDER BY date ASC',
+        `SELECT * FROM ${table('payments')} WHERE client_id = $1 ORDER BY date ASC`,
         [client.id]
       );
       client.payments = paymentsResult.rows;
 
       const historyResult = await pool.query(
-        'SELECT * FROM overdue_history WHERE client_id = $1 ORDER BY created_at DESC',
+        `SELECT * FROM ${table('overdue_history')} WHERE client_id = $1 ORDER BY created_at DESC`,
         [client.id]
       );
       client.overdueHistory = historyResult.rows;
@@ -566,7 +583,7 @@ app.post('/api/schools/:schoolId/clients', authenticateToken, async (req, res) =
 
       // Загружаем полные данные клиента с платежами
       const paymentsResult = await pool.query(
-        'SELECT * FROM payments WHERE client_id = $1 ORDER BY date ASC',
+        `SELECT * FROM ${table('payments')} WHERE client_id = $1 ORDER BY date ASC`,
         [newClient.id]
       );
       newClient.payments = paymentsResult.rows;
@@ -644,7 +661,7 @@ app.patch('/api/schools/:schoolId/clients/:clientId/payments/:paymentIndex',
 
       // Получаем платежи клиента
       const paymentsResult = await pool.query(
-        'SELECT * FROM payments WHERE client_id = $1 ORDER BY date ASC',
+        `SELECT * FROM ${table('payments')} WHERE client_id = $1 ORDER BY date ASC`,
         [clientId]
       );
 
@@ -655,7 +672,7 @@ app.patch('/api/schools/:schoolId/clients/:clientId/payments/:paymentIndex',
 
       // Обновляем статус
       await pool.query(
-        'UPDATE payments SET paid = $1 WHERE id = $2',
+        `UPDATE ${table('payments')} SET paid = $1 WHERE id = $2',
         [paid, payment.id]
       );
 
@@ -682,7 +699,7 @@ app.post('/api/schools/:schoolId/clients/:clientId/payments/:paymentIndex/postpo
 
       // Получаем платежи клиента
       const paymentsResult = await pool.query(
-        'SELECT * FROM payments WHERE client_id = $1 ORDER BY date ASC',
+        `SELECT * FROM ${table('payments')} WHERE client_id = $1 ORDER BY date ASC`,
         [clientId]
       );
 

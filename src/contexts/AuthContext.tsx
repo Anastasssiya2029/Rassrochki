@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { User, School, AuthContextType } from '../types/auth';
 import { apiService } from '../services/api';
-import { useMockApi } from '../utils/env';
+import { isApiConnected } from '../utils/env';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Переключатель для использования моков (для разработки без бэкенда)
-const USE_MOCK_API = useMockApi();
+const USE_MOCK_API = !isApiConnected();
 
 // Моковые данные школ
 const MOCK_SCHOOLS: School[] = [

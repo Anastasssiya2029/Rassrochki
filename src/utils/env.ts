@@ -3,14 +3,16 @@
  */
 
 /**
- * Проверяет, подключен ли реальный API (есть ли REACT_APP_API_URL)
+ * Проверяет, подключен ли реальный API
  * @returns true если API подключен, false если используются моки
  */
 export const isApiConnected = (): boolean => {
-  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
-    return !!process.env.REACT_APP_API_URL;
+  // Если установлена переменная VITE_API_URL, используем её
+  if (import.meta.env.VITE_API_URL) {
+    return true;
   }
-  return false;
+  // Иначе используем прокси Vite (в dev режиме backend доступен через /api)
+  return import.meta.env.MODE === 'development';
 };
 
 /**
@@ -18,9 +20,15 @@ export const isApiConnected = (): boolean => {
  * @returns URL API или пустая строка
  */
 export const getApiUrl = (): string => {
-  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
+  // Если явно указан URL API, используем его
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
   }
+  // В dev режиме используем прокси (запросы к /api будут проксироваться на localhost:3001)
+  if (import.meta.env.MODE === 'development') {
+    return '/api';
+  }
+  // В остальных случаях моковый режим
   return '';
 };
 

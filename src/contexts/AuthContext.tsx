@@ -37,9 +37,9 @@ const MOCK_SCHOOLS: School[] = [
 const MOCK_USERS: Array<User & { password: string }> = [
   {
     id: '1',
-    email: 'architect@example.com',
-    password: 'architect123',
-    name: 'Главный Архитектор',
+    email: 'sochneva.anastasiya@gmail.com',
+    password: 'qwertyasd',
+    name: 'Анастасия Сочнева',
     role: 'architect',
     schoolId: null,
   },

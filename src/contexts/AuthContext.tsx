@@ -5,9 +5,6 @@ import { isApiConnected } from '../utils/env';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Переключатель для использования моков (для разработки без бэкенда)
-const USE_MOCK_API = !isApiConnected();
-
 // Моковые данные школ
 const MOCK_SCHOOLS: School[] = [
   { 
@@ -90,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const login = async (email: string, password: string) => {
-    if (USE_MOCK_API) {
+    if (!isApiConnected()) {
       // MOCK API - для разработки
       const foundUser = MOCK_USERS.find(
         u => u.email === email && u.password === password
@@ -132,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     name: string,
     schoolName?: string
   ) => {
-    if (USE_MOCK_API) {
+    if (!isApiConnected()) {
       // MOCK API - для разработки
       const existingUser = MOCK_USERS.find(u => u.email === email);
       if (existingUser) {
@@ -185,7 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    if (!USE_MOCK_API) {
+    if (isApiConnected()) {
       apiService.logout().catch(console.error);
     }
     
@@ -197,7 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const selectSchool = async (schoolId: string) => {
-    if (USE_MOCK_API) {
+    if (!isApiConnected()) {
       // MOCK API
       const selectedSchool = MOCK_SCHOOLS.find(s => s.id === schoolId);
       if (selectedSchool) {

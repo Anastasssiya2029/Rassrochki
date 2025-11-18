@@ -17,10 +17,12 @@ This is a payment tracking and installment management system for online schools.
   - PostgreSQL database for schools, users, clients, and payments
 
 ## Current Setup
-The application is currently running in **demo mode** without a backend connection. This means:
-- Uses mock data for demonstration
-- All features are functional but data is not persisted
-- Perfect for testing the UI and workflows
+The application is running with **full backend integration**:
+- PostgreSQL database (Replit-hosted)
+- Node.js/Express backend API (port 3001)
+- Real-time data persistence
+- JWT authentication
+- Full production-ready stack
 
 ## Running the Application
 
@@ -32,11 +34,17 @@ The application runs automatically via the **Frontend** workflow. To start or re
 The app will start on **port 5000** and appear in the Webview panel.
 
 ### Current Configuration
-- **Workflow**: Frontend (configured to run `npm run dev`)
+**Frontend:**
+- **Workflow**: Frontend (runs `npm run dev`)
 - **Port**: 5000 (automatically exposed by Replit)
 - **Host**: 0.0.0.0 (configured for Replit proxy)
-- **Demo Mode**: Active (no backend required)
 - **URL**: Available in the Webview panel
+
+**Backend:**
+- **Workflow**: Backend (runs `cd src/backend-example && node server.js`)
+- **Port**: 3001 (internal, accessed via Vite proxy)
+- **Database**: PostgreSQL (Replit-hosted)
+- **API Endpoint**: `/api` (proxied from frontend)
 
 ### Stopping/Restarting
 - Use the workflow controls in the Replit interface
@@ -51,18 +59,29 @@ The app will start on **port 5000** and appear in the Webview panel.
 - **School Management**: Multi-school support (Architect role)
 - **User Roles**: Architect, Admin, Manager, Assistant
 
-## Optional: Backend Setup
-If you want to connect a real backend with PostgreSQL:
+## Backend & Database
 
-1. Set up PostgreSQL database (use Replit's built-in PostgreSQL)
-2. Navigate to backend: `cd src/backend-example`
-3. Install dependencies: `npm install`
-4. Create `.env` file with database credentials
-5. Initialize database: `npm run init-db`
-6. Run backend: `npm start` (will run on port 3001)
-7. Set `REACT_APP_API_URL` environment variable in frontend
+The backend is **already configured** and running:
 
-See `src/backend-example/README.md` for detailed backend instructions.
+### Database Schema
+- `schools` - School organizations
+- `users` - User accounts (Architect, Admin, Manager, Assistant roles)
+- `clients` - Client records with payment plans
+- `payments` - Individual payment records
+- `overdue_history` - Payment postponement history
+
+### Current User Account
+**Email:** sochneva.anastasiya@gmail.com  
+**Role:** Architect (full system access)  
+**Password:** Set during setup
+
+### How It Works
+- Frontend (port 5000) → Vite proxy → Backend (port 3001) → PostgreSQL
+- Authentication via JWT tokens
+- All API requests go through `/api` endpoint
+- Automatic database connection using Replit environment variables
+
+See `src/backend-example/README.md` for API documentation.
 
 ## Technologies Used
 - React 18
@@ -77,17 +96,25 @@ See `src/backend-example/README.md` for detailed backend instructions.
 - PostgreSQL (backend)
 
 ## Recent Changes
-- **2025-11-18**: Initial Replit setup
-  - Configured Vite for Replit environment (port 5000, host 0.0.0.0)
-  - Created frontend workflow
-  - Added .gitignore for Node.js project
-  - Verified demo mode functionality
+- **2025-11-18**: Full stack setup completed
+  - ✅ Configured Vite for Replit (port 5000, host 0.0.0.0, allowedHosts)
+  - ✅ Created Frontend workflow
+  - ✅ Created PostgreSQL database (Replit-hosted)
+  - ✅ Configured Backend workflow (port 3001)
+  - ✅ Initialized database schema (5 tables)
+  - ✅ Created Architect user account
+  - ✅ Configured Vite proxy for API routing
+  - ✅ Updated env.ts for development mode detection
+  - ✅ Added TypeScript definitions for Vite environment
+  - ✅ Verified full stack integration (frontend ↔ backend ↔ database)
 
 ## Project Status
-✅ Frontend running in demo mode
-✅ All UI components functional
-⚠️ Backend not configured (optional)
-⚠️ Database not connected (optional)
+✅ Frontend running (React + Vite)
+✅ Backend running (Node.js + Express)
+✅ Database connected (PostgreSQL)
+✅ Full stack integration working
+✅ User authentication functional
+✅ All UI components operational
 
 ## Deployment
 Ready to deploy as a static frontend application or configure backend for full functionality.

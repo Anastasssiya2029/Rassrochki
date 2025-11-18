@@ -476,7 +476,7 @@ export function SchoolManagement({ schools, onAddSchool, onEditSchool, onDeleteS
                   <div className="flex items-center gap-1 text-gray-600 text-sm">
                     <Calendar className="w-4 h-4" />
                     <span>
-                      Создана {school.createdAt.toLocaleDateString('ru-RU', { 
+                      Создана {new Date(school.createdAt).toLocaleDateString('ru-RU', { 
                         day: 'numeric', 
                         month: 'long', 
                         year: 'numeric' 

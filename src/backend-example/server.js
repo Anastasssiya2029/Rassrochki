@@ -77,16 +77,9 @@ app.post('/api/auth/register', async (req, res) => {
   const { email, password, name, schoolName } = req.body;
 
   try {
-    // Проверяем, существует ли пользователь
-    const existingUser = await pool.query(
-      `SELECT * FROM ${table('users')} WHERE email = $1`,
-      [email]
-    );
-
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'Пользователь уже существует' });
-    }
-
+    // Multi-role поддержка: не проверяем уникальность email
+    // Пользователь может регистрировать несколько школ с одним email
+    
     // Хешируем пароль
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -312,16 +305,9 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
 
-    // Проверяем, существует ли администратор с таким email
-    const existingUser = await pool.query(
-      `SELECT * FROM ${table('users')} WHERE email = $1`,
-      [adminEmail]
-    );
-
-    if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'Пользователь с таким email уже существует' });
-    }
-
+    // Multi-role поддержка: не проверяем уникальность email
+    // Пользователь может быть admin нескольких школ
+    
     await pool.query('BEGIN');
 
     try {

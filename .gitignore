@@ -49,3 +49,4 @@ coverage/
 # Backend sensitive files
 src/backend-example/.env
 src/backend-example/create-architect.js
+src/backend-example/create-demo-users.js

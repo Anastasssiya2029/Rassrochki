@@ -17,15 +17,21 @@ app.use(express.json());
 
 // PostgreSQL Connection
 const pool = new Pool({
-  host: process.env.PGHOST,
-  port: process.env.PGPORT,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
+  host: process.env.POSTGRESQL_HOST || process.env.PGHOST,
+  port: process.env.POSTGRESQL_PORT || process.env.PGPORT,
+  user: process.env.POSTGRESQL_USER || process.env.PGUSER,
+  password: process.env.POSTGRESQL_PASSWORD || process.env.PGPASSWORD,
+  database: process.env.POSTGRESQL_DBNAME || process.env.PGDATABASE,
   ssl: {
     rejectUnauthorized: false // Для продакшена настройте SSL правильно
   }
 });
+
+// Схема для изоляции данных проекта
+const SCHEMA = process.env.POSTGRESQL_SCHEMA || 'public';
+
+// Функция для добавления схемы к имени таблицы
+const table = (name) => `${SCHEMA}.${name}`;
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-this';
 

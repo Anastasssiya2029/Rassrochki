@@ -3,20 +3,28 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
-  host: process.env.PGHOST,
-  port: process.env.PGPORT,
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  database: process.env.PGDATABASE,
+  host: process.env.POSTGRESQL_HOST || process.env.PGHOST,
+  port: process.env.POSTGRESQL_PORT || process.env.PGPORT,
+  user: process.env.POSTGRESQL_USER || process.env.PGUSER,
+  password: process.env.POSTGRESQL_PASSWORD || process.env.PGPASSWORD,
+  database: process.env.POSTGRESQL_DBNAME || process.env.PGDATABASE,
   ssl: {
     rejectUnauthorized: false
   }
 });
 
+const SCHEMA = process.env.POSTGRESQL_SCHEMA || 'public';
+
 async function initDatabase() {
   const client = await pool.connect();
 
   try {
+    console.log(`🔧 Создание схемы ${SCHEMA}...`);
+    
+    // Создаем схему для изоляции данных проекта
+    await client.query(`CREATE SCHEMA IF NOT EXISTS ${SCHEMA};`);
+    console.log(`✅ Схема ${SCHEMA} создана`);
+    
     console.log('🔧 Создание таблиц...');
 
     // Создаем таблицу schools

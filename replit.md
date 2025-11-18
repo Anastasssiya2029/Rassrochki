@@ -78,7 +78,14 @@ The backend is **already configured** and running:
 ### Current User Account
 **Email:** sochneva.anastasiya@gmail.com  
 **Role:** Architect (full system access)  
-**Password:** Set during setup
+**Password:** qwertyasd
+
+### Multi-Role Support
+The system supports **multiple roles per email address**:
+- One email can be an architect AND admin of different schools
+- Admins can be managers in other organizations
+- No UNIQUE constraint on email field (removed for multi-role support)
+- Each user record is unique by (email + role + school_id) combination
 
 ### How It Works
 - Frontend (port 5000) → Vite proxy → Backend (port 3001) → External PostgreSQL
@@ -86,6 +93,10 @@ The backend is **already configured** and running:
 - All API requests go through `/api` endpoint
 - Database connection using external PostgreSQL server
 - All data stored in dedicated `payment_tracking` schema for project isolation
+- **Schema Resolution**: Uses PostgreSQL `search_path` approach for automatic schema resolution
+  - Connection sets `search_path = payment_tracking, public` on connect
+  - All queries use unqualified table names (e.g., `SELECT * FROM users`)
+  - pg-format.ident() used for safe schema name escaping where needed
 
 See `src/backend-example/README.md` for API documentation.
 
@@ -109,12 +120,15 @@ See `src/backend-example/README.md` for API documentation.
   - ✅ Created dedicated schema `payment_tracking` for project isolation
   - ✅ Configured Backend workflow (port 3001)
   - ✅ Initialized database schema (5 tables in payment_tracking schema)
-  - ✅ Updated all SQL queries to use schema-qualified table names
-  - ✅ Created Architect user account (sochneva.anastasiya@gmail.com)
+  - ✅ Implemented search_path approach for schema resolution (simpler than schema-qualified queries)
+  - ✅ Fixed SQL syntax errors in server.js (incorrect quote usage in template literals)
+  - ✅ Removed UNIQUE constraint on email field to support multi-role functionality
+  - ✅ Created Architect user account (sochneva.anastasiya@gmail.com / qwertyasd)
   - ✅ Configured Vite proxy for API routing
   - ✅ Updated env.ts for development mode detection
   - ✅ Added TypeScript definitions for Vite environment
   - ✅ Verified full stack integration (frontend ↔ backend ↔ external database)
+  - ✅ Tested multi-role support (one email with multiple roles in different schools)
 
 ## Project Status
 ✅ Frontend running (React + Vite)

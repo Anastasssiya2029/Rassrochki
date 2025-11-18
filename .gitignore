@@ -50,3 +50,5 @@ coverage/
 src/backend-example/.env
 src/backend-example/create-architect.js
 src/backend-example/create-demo-users.js
+src/backend-example/add-architect.js
+src/backend-example/update-password.js

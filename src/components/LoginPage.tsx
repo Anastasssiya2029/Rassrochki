@@ -161,38 +161,6 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
               </button>
             </p>
           </div>
-
-          {/* Demo Credentials */}
-          {apiConnected && (
-            <div className="mt-6 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl border border-purple-200/50">
-              <p className="text-gray-700 text-sm mb-3 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-purple-500" />
-                <span>Тестовые учетные данные:</span>
-              </p>
-              <div className="space-y-2 text-xs text-gray-600">
-                <div className="bg-white/60 rounded-lg p-2">
-                  <p className="font-semibold text-gray-700">Архитектор:</p>
-                  <p>architect@example.com / architect123</p>
-                </div>
-                <div className="bg-white/60 rounded-lg p-2">
-                  <p className="font-semibold text-gray-700">Администратор:</p>
-                  <p>admin@progress.com / admin123</p>
-                </div>
-                <div className="bg-white/60 rounded-lg p-2">
-                  <p className="font-semibold text-gray-700">Помощник админа:</p>
-                  <p>assistant@progress.com / assistant123</p>
-                </div>
-                <div className="bg-white/60 rounded-lg p-2">
-                  <p className="font-semibold text-gray-700">Менеджер (Галина):</p>
-                  <p>galina@progress.com / manager123</p>
-                </div>
-                <div className="bg-white/60 rounded-lg p-2">
-                  <p className="font-semibold text-gray-700">Менеджер (Андрей):</p>
-                  <p>andrey@progress.com / manager123</p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

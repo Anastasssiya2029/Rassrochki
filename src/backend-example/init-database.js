@@ -29,7 +29,7 @@ async function initDatabase() {
 
     // Создаем таблицу schools
     await client.query(`
-      CREATE TABLE IF NOT EXISTS schools (
+      CREATE TABLE IF NOT EXISTS ${SCHEMA}.schools (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         name VARCHAR(255) NOT NULL,
         created_at TIMESTAMP DEFAULT NOW()
@@ -39,13 +39,13 @@ async function initDatabase() {
 
     // Создаем таблицу users
     await client.query(`
-      CREATE TABLE IF NOT EXISTS users (
+      CREATE TABLE IF NOT EXISTS ${SCHEMA}.users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         name VARCHAR(255) NOT NULL,
         role VARCHAR(50) NOT NULL CHECK (role IN ('architect', 'admin', 'manager', 'assistant')),
-        school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
+        school_id UUID REFERENCES ${SCHEMA}.schools(id) ON DELETE CASCADE,
         created_at TIMESTAMP DEFAULT NOW()
       );
     `);
@@ -53,14 +53,14 @@ async function initDatabase() {
 
     // Создаем индекс на email
     await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+      CREATE INDEX IF NOT EXISTS idx_users_email ON ${SCHEMA}.users(email);
     `);
 
     // Создаем таблицу clients
     await client.query(`
-      CREATE TABLE IF NOT EXISTS clients (
+      CREATE TABLE IF NOT EXISTS ${SCHEMA}.clients (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        school_id UUID REFERENCES schools(id) ON DELETE CASCADE NOT NULL,
+        school_id UUID REFERENCES ${SCHEMA}.schools(id) ON DELETE CASCADE NOT NULL,
         name VARCHAR(255) NOT NULL,
         username VARCHAR(255),
         tariff VARCHAR(255),
@@ -78,14 +78,14 @@ async function initDatabase() {
 
     // Создаем индекс на school_id
     await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_clients_school_id ON clients(school_id);
+      CREATE INDEX IF NOT EXISTS idx_clients_school_id ON ${SCHEMA}.clients(school_id);
     `);
 
     // Создаем таблицу payments
     await client.query(`
-      CREATE TABLE IF NOT EXISTS payments (
+      CREATE TABLE IF NOT EXISTS ${SCHEMA}.payments (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        client_id UUID REFERENCES clients(id) ON DELETE CASCADE NOT NULL,
+        client_id UUID REFERENCES ${SCHEMA}.clients(id) ON DELETE CASCADE NOT NULL,
         date DATE NOT NULL,
         amount DECIMAL(10, 2) NOT NULL,
         paid BOOLEAN DEFAULT FALSE,
@@ -98,14 +98,14 @@ async function initDatabase() {
 
     // Создаем индекс на client_id
     await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_payments_client_id ON payments(client_id);
+      CREATE INDEX IF NOT EXISTS idx_payments_client_id ON ${SCHEMA}.payments(client_id);
     `);
 
     // Создаем таблицу overdue_history
     await client.query(`
-      CREATE TABLE IF NOT EXISTS overdue_history (
+      CREATE TABLE IF NOT EXISTS ${SCHEMA}.overdue_history (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        client_id UUID REFERENCES clients(id) ON DELETE CASCADE NOT NULL,
+        client_id UUID REFERENCES ${SCHEMA}.clients(id) ON DELETE CASCADE NOT NULL,
         original_date DATE NOT NULL,
         postponed_date DATE NOT NULL,
         reason TEXT,
@@ -117,7 +117,7 @@ async function initDatabase() {
 
     // Создаем индекс на client_id
     await client.query(`
-      CREATE INDEX IF NOT EXISTS idx_overdue_client_id ON overdue_history(client_id);
+      CREATE INDEX IF NOT EXISTS idx_overdue_client_id ON ${SCHEMA}.overdue_history(client_id);
     `);
 
     console.log('\n✅ База данных успешно инициализирована!');

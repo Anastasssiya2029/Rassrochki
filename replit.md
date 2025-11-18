@@ -23,10 +23,24 @@ The application is currently running in **demo mode** without a backend connecti
 - Perfect for testing the UI and workflows
 
 ## Running the Application
-The frontend is already configured and running:
-- **URL**: Available in the Webview panel
-- **Port**: 5000
+
+### Starting the App
+The application runs automatically via the **Frontend** workflow. To start or restart:
+1. Click the **Run** button in the top toolbar, or
+2. Use the command: `npm run dev`
+
+The app will start on **port 5000** and appear in the Webview panel.
+
+### Current Configuration
+- **Workflow**: Frontend (configured to run `npm run dev`)
+- **Port**: 5000 (automatically exposed by Replit)
+- **Host**: 0.0.0.0 (configured for Replit proxy)
 - **Demo Mode**: Active (no backend required)
+- **URL**: Available in the Webview panel
+
+### Stopping/Restarting
+- Use the workflow controls in the Replit interface
+- Or manually stop with Ctrl+C in the console and restart with `npm run dev`
 
 ## Features
 - **User Authentication**: Login and registration system

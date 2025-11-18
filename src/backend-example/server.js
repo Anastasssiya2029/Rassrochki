@@ -17,11 +17,11 @@ app.use(express.json());
 
 // PostgreSQL Connection
 const pool = new Pool({
-  host: process.env.POSTGRESQL_HOST || '194.87.215.84',
-  port: process.env.POSTGRESQL_PORT || 5432,
-  user: process.env.POSTGRESQL_USER || 'gen_user',
-  password: process.env.POSTGRESQL_PASSWORD || 'XHz-?+<i9P3;wI',
-  database: process.env.POSTGRESQL_DBNAME || 'data_vrassrochki',
+  host: process.env.PGHOST,
+  port: process.env.PGPORT,
+  user: process.env.PGUSER,
+  password: process.env.PGPASSWORD,
+  database: process.env.PGDATABASE,
   ssl: {
     rejectUnauthorized: false // Для продакшена настройте SSL правильно
   }

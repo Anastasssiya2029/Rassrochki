@@ -92,14 +92,14 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Создаем школу
     const schoolResult = await pool.query(
-      `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *',
+      `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *`,
       [schoolName]
     );
     const school = schoolResult.rows[0];
 
     // Создаем пользователя-администратора
     const userResult = await pool.query(
-      `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id',
+      `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id`,
       [email, hashedPassword, name, 'admin', school.id]
     );
     const user = userResult.rows[0];
@@ -134,10 +134,10 @@ app.post('/api/auth/register', async (req, res) => {
 
 // Вход
 app.post('/api/auth/login', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, roleId } = req.body;
 
   try {
-    // Находим пользователя
+    // Находим всех пользователей с данным email
     const result = await pool.query(
       `SELECT * FROM ${table('users')} WHERE email = $1`,
       [email]
@@ -147,12 +147,54 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ message: 'Неверный email или пароль' });
     }
 
-    const user = result.rows[0];
-
-    // Проверяем пароль
-    const validPassword = await bcrypt.compare(password, user.password_hash);
+    // Проверяем пароль у первого пользователя (пароль общий для всех ролей)
+    const firstUser = result.rows[0];
+    const validPassword = await bcrypt.compare(password, firstUser.password_hash);
     if (!validPassword) {
       return res.status(401).json({ message: 'Неверный email или пароль' });
+    }
+
+    // Если roleId указан, используем конкретную роль
+    let user;
+    if (roleId) {
+      user = result.rows.find(u => u.id === roleId);
+      if (!user) {
+        return res.status(404).json({ message: 'Роль не найдена' });
+      }
+    } else {
+      // Если ролей несколько, возвращаем их для выбора
+      if (result.rows.length > 1) {
+        const rolesWithSchools = await Promise.all(result.rows.map(async (u) => {
+          let school = null;
+          if (u.school_id) {
+            const schoolResult = await pool.query(
+              `SELECT * FROM ${table('schools')} WHERE id = $1`,
+              [u.school_id]
+            );
+            if (schoolResult.rows.length > 0) {
+              school = schoolResult.rows[0];
+            }
+          }
+          return {
+            id: u.id,
+            role: u.role,
+            school: school ? {
+              id: school.id,
+              name: school.name
+            } : null
+          };
+        }));
+        
+        return res.json({
+          multipleRoles: true,
+          roles: rolesWithSchools,
+          email: firstUser.email,
+          name: firstUser.name
+        });
+      }
+      
+      // Одна роль - используем её
+      user = firstUser;
     }
 
     // Генерируем токен
@@ -285,7 +327,7 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
     try {
       // Создаем школу
       const schoolResult = await pool.query(
-        `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *',
+        `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *`,
         [schoolName]
       );
       const school = schoolResult.rows[0];
@@ -295,7 +337,7 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
 
       // Создаем администратора школы
       const adminResult = await pool.query(
-        `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id',
+        `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id`,
         [adminEmail, hashedPassword, adminName, 'admin', school.id]
       );
       const admin = adminResult.rows[0];
@@ -672,7 +714,7 @@ app.patch('/api/schools/:schoolId/clients/:clientId/payments/:paymentIndex',
 
       // Обновляем статус
       await pool.query(
-        `UPDATE ${table('payments')} SET paid = $1 WHERE id = $2',
+        `UPDATE ${table('payments')} SET paid = $1 WHERE id = $2`,
         [paid, payment.id]
       );
 

@@ -42,11 +42,11 @@ async function initDatabase() {
     `);
     console.log('✅ Таблица schools создана');
 
-    // Создаем таблицу users
+    // Создаем таблицу users (без UNIQUE на email для поддержки multi-role)
     await client.query(`
       CREATE TABLE IF NOT EXISTS ${SCHEMA}.users (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        email VARCHAR(255) UNIQUE NOT NULL,
+        email VARCHAR(255) NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         name VARCHAR(255) NOT NULL,
         role VARCHAR(50) NOT NULL CHECK (role IN ('architect', 'admin', 'manager', 'assistant')),

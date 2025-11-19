@@ -162,7 +162,6 @@ export function DayDetailsDialog({
                           >
                             {item.client.name}
                           </h4>
-                          {item.isPrepayment && <span>🌸</span>}
                           {isPostponed && <span>🙏</span>}
                         </div>
                         <p className="text-[#263238]/70">{item.client.username}</p>

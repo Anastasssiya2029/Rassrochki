@@ -124,19 +124,14 @@ See `src/backend-example/README.md` for API documentation.
     - Dropdown now appears correctly above modal dialogs
   - ✅ Maintained backward compatibility with Input fallback when no managers exist
 
-- **2025-11-19**: Enhanced prepayment display in calendar cells and tooltips
-  - ✅ Calendar cells now show individual payment amounts and status (not just totals)
-  - ✅ Prepayments ALWAYS displayed first in calendar cells (sorted to top)
-  - ✅ Each payment shows: amount (blue for prepayments) + status label "Предоплата"
-  - ✅ Up to 2 payments per cell with "+N ещё" overflow indicator
+- **2025-11-19**: Simplified calendar display - removed prepayments, show only aggregated sums
+  - ✅ Calendar cells now show only 2 aggregated sums per day (always visible):
+    - "Ожидается" - sum of all unpaid payments (default color)
+    - "Оплачено" - sum of all paid payments (green)
+  - ✅ Removed prepayment-specific display from calendar cells (no 🌸 flower emoji)
+  - ✅ Both sums always displayed, even when 0 ₽
   - ✅ Added fallback handling (|| 0) for undefined/null payment amounts
-  - ✅ Prevents tooltip rendering issues when amount data is missing
-  - ✅ Prepayments (first payments) marked with blue text color and flower emoji 🌸
-  - ✅ Flower emoji visible in calendar preview (month view cells)
-  - ✅ Blue color (blue-500) applied to prepayment amounts in cells and tooltips
-  - ✅ Tooltip shows "Предоплата" (blue) with amount for prepayments
-  - ✅ Updated calendar legend with prepayment indicators (blue dot + flower)
-  - ✅ Added safe guards in isPrepayment() to handle missing prepaymentDate
+  - ✅ Clean aggregated view for better clarity
 
 - **2025-11-19**: Implemented architect role isolation - schools managed only in dedicated admin panel
   - ✅ Removed "Школы" tab from Dashboard - architect sees same interface as other roles when working in a school

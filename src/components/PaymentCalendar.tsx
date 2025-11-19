@@ -218,7 +218,6 @@ export function PaymentCalendar({
                           </span>
                           {payments.length > 0 && (
                             <div className="flex gap-1 items-center flex-wrap">
-                              {hasPrepayments && <span className="text-xs">🌸</span>}
                               {hasPostponedPayments && <span className="text-xs">🙏</span>}
                               {hasPaidPayments && (
                                 <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
@@ -232,41 +231,32 @@ export function PaymentCalendar({
                         {payments.length > 0 && (
                           <div className="mt-1 space-y-1">
                             {(() => {
-                              // Сортируем: предоплаты всегда первыми
-                              const sortedPayments = [...payments].sort((a, b) => {
-                                if (a.isPrepayment && !b.isPrepayment) return -1;
-                                if (!a.isPrepayment && b.isPrepayment) return 1;
-                                return 0;
-                              });
-                              const displayPayments = sortedPayments.slice(0, 2);
+                              const paidTotal = payments
+                                .filter(p => p.payment.paid)
+                                .reduce((sum, p) => sum + (p.payment.amount || 0), 0);
+                              
+                              const unpaidTotal = payments
+                                .filter(p => !p.payment.paid)
+                                .reduce((sum, p) => sum + (p.payment.amount || 0), 0);
                               
                               return (
                                 <>
-                                  {displayPayments.map((item, idx) => (
-                                    <div key={idx} className="text-xs">
-                                      <p className={
-                                        item.isPrepayment 
-                                          ? 'text-blue-500 font-medium' 
-                                          : item.payment.paid 
-                                          ? 'text-green-600' 
-                                          : 'text-[#2D1B69]'
-                                      }>
-                                        {(item.payment.amount || 0).toLocaleString('ru-RU')} ₽
-                                      </p>
-                                      <p className={`text-xs ${
-                                        item.isPrepayment 
-                                          ? 'text-blue-500' 
-                                          : 'text-[#263238]/70'
-                                      }`}>
-                                        {item.isPrepayment ? 'Предоплата' : item.payment.paid ? 'Оплачено' : 'Ожидается'}
-                                      </p>
-                                    </div>
-                                  ))}
-                                  {payments.length > 2 && (
-                                    <p className="text-[#263238]/70 text-xs">
-                                      +{payments.length - 2} ещё
+                                  <div className="text-xs">
+                                    <p className="text-[#2D1B69] font-medium">
+                                      {unpaidTotal.toLocaleString('ru-RU')} ₽
                                     </p>
-                                  )}
+                                    <p className="text-[#263238]/70 text-xs">
+                                      Ожидается
+                                    </p>
+                                  </div>
+                                  <div className="text-xs">
+                                    <p className="text-green-600 font-medium">
+                                      {paidTotal.toLocaleString('ru-RU')} ₽
+                                    </p>
+                                    <p className="text-green-600/70 text-xs">
+                                      Оплачено
+                                    </p>
+                                  </div>
                                 </>
                               );
                             })()}

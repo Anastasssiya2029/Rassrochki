@@ -265,7 +265,7 @@ export function PaymentCalendar({
                                     ? 'text-green-600' 
                                     : 'text-[#263238]'
                                 }>
-                                  {item.payment.amount.toLocaleString('ru-RU')} ₽
+                                  {(item.payment.amount || 0).toLocaleString('ru-RU')} ₽
                                 </p>
                                 <p className={`text-xs ${
                                   item.isPrepayment && item.payment.paid 

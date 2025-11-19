@@ -113,6 +113,13 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-19**: Fixed manager dropdown not opening in AddClientDialog
+  - ✅ Root cause: Radix UI Select doesn't work when value is empty string '' but no SelectItem has that value
+  - ✅ Changed formData.manager initialization from '' to undefined
+  - ✅ Updated Select value prop to use undefined when no manager selected
+  - ✅ Added explicit TypeScript types to formData state (manager: string | undefined)
+  - ✅ Maintained backward compatibility with Input fallback when no managers exist
+
 - **2025-11-19**: Fixed prepayment amount display in calendar tooltip
   - ✅ Added fallback handling (|| 0) for undefined/null payment amounts
   - ✅ Prevents tooltip rendering issues when amount data is missing

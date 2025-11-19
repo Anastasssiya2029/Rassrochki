@@ -114,10 +114,14 @@ See `src/backend-example/README.md` for API documentation.
 
 ## Recent Changes
 - **2025-11-19**: Fixed manager dropdown not opening in AddClientDialog
-  - ✅ Root cause: Radix UI Select doesn't work when value is empty string '' but no SelectItem has that value
-  - ✅ Changed formData.manager initialization from '' to undefined
-  - ✅ Updated Select value prop to use undefined when no manager selected
-  - ✅ Added explicit TypeScript types to formData state (manager: string | undefined)
+  - ✅ Root cause #1: Radix UI Select doesn't work when value is empty string '' but no SelectItem has that value
+    - Changed formData.manager initialization from '' to undefined
+    - Updated Select value prop to use undefined when no manager selected
+    - Added explicit TypeScript types to formData state (manager: string | undefined)
+  - ✅ Root cause #2: z-index conflict between Dialog (z-[9999]) and SelectContent (z-50)
+    - SelectContent was rendering behind Dialog modal, making dropdown invisible
+    - Increased SelectContent z-index from z-50 to z-[10000] in ui/select.tsx
+    - Dropdown now appears correctly above modal dialogs
   - ✅ Maintained backward compatibility with Input fallback when no managers exist
 
 - **2025-11-19**: Fixed prepayment amount display in calendar tooltip

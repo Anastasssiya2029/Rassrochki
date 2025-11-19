@@ -21,6 +21,7 @@ interface DayPayment {
     postponeReason?: string;
     comment?: string;
   };
+  isPrepayment?: boolean;
 }
 
 interface DayDetailsDialogProps {
@@ -156,6 +157,7 @@ export function DayDetailsDialog({
                           <h4 className="text-[#2D1B69]">
                             {item.client.name}
                           </h4>
+                          {item.isPrepayment && <span>🌸</span>}
                           {isPostponed && <span>🙏</span>}
                         </div>
                         <p className="text-[#263238]/70">{item.client.username}</p>
@@ -196,7 +198,13 @@ export function DayDetailsDialog({
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 justify-end">
-                          <p className={`${item.payment.paid ? 'text-green-600' : 'text-[#2D1B69]'}`}>
+                          <p className={`${
+                            item.isPrepayment && item.payment.paid
+                              ? 'text-blue-500'
+                              : item.payment.paid 
+                              ? 'text-green-600' 
+                              : 'text-[#2D1B69]'
+                          }`}>
                             {item.payment.amount.toLocaleString('ru-RU')} ₽
                           </p>
                           {!item.payment.paid && (

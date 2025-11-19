@@ -90,6 +90,11 @@ export function PaymentCalendar({
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
+  const isPrepayment = (client: Client, payment: { date: Date }) => {
+    if (!client.prepaymentDate) return false;
+    return isSameDay(payment.date, client.prepaymentDate);
+  };
+
   const getPaymentsForDay = (day: Date) => {
     const dayPayments: Array<{
       client: Client;
@@ -102,6 +107,7 @@ export function PaymentCalendar({
         postponeReason?: string;
         comment?: string;
       };
+      isPrepayment: boolean;
     }> = [];
     
     clients.forEach(client => {
@@ -110,7 +116,8 @@ export function PaymentCalendar({
           dayPayments.push({
             client,
             paymentIndex: index,
-            payment
+            payment,
+            isPrepayment: isPrepayment(client, payment)
           });
         }
       });
@@ -190,6 +197,7 @@ export function PaymentCalendar({
                 const hasPaidPayments = payments.some(p => p.payment.paid);
                 const hasUnpaidPayments = payments.some(p => !p.payment.paid);
                 const hasPostponedPayments = payments.some(p => p.payment.originalDate);
+                const hasPrepayments = payments.some(p => p.isPrepayment);
 
                 return (
                   <Tooltip key={index}>
@@ -210,6 +218,7 @@ export function PaymentCalendar({
                           </span>
                           {payments.length > 0 && (
                             <div className="flex gap-1 items-center flex-wrap">
+                              {hasPrepayments && <span className="text-xs">🌸</span>}
                               {hasPostponedPayments && <span className="text-xs">🙏</span>}
                               {hasPaidPayments && (
                                 <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
@@ -243,15 +252,28 @@ export function PaymentCalendar({
                               <div>
                                 <p className="text-[#2D1B69] flex items-center gap-1">
                                   {item.client.name}
+                                  {item.isPrepayment && <span>🌸</span>}
                                   {item.payment.originalDate && <span>🙏</span>}
                                 </p>
                                 <p className="text-[#263238]/70">{item.client.username}</p>
                               </div>
                               <div className="text-right">
-                                <p className={item.payment.paid ? 'text-green-600' : 'text-[#263238]'} >
+                                <p className={
+                                  item.isPrepayment && item.payment.paid 
+                                    ? 'text-blue-500' 
+                                    : item.payment.paid 
+                                    ? 'text-green-600' 
+                                    : 'text-[#263238]'
+                                }>
                                   {item.payment.amount.toLocaleString('ru-RU')} ₽
                                 </p>
-                                <p className={`text-xs ${item.payment.paid ? 'text-green-600' : 'text-[#263238]/70'}`}>
+                                <p className={`text-xs ${
+                                  item.isPrepayment && item.payment.paid 
+                                    ? 'text-blue-500' 
+                                    : item.payment.paid 
+                                    ? 'text-green-600' 
+                                    : 'text-[#263238]/70'
+                                }`}>
                                   {item.payment.paid ? 'Оплачено' : 'Ожидается'}
                                 </p>
                               </div>
@@ -281,8 +303,16 @@ export function PaymentCalendar({
               <span className="text-[#263238]/70 font-semibold">Оплачено</span>
             </div>
             <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
+              <span className="text-[#263238]/70 font-semibold">Предоплата</span>
+            </div>
+            <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-purple-600 shadow-sm shadow-purple-600/50" />
               <span className="text-[#263238]/70 font-semibold">Ожидается</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span>🌸</span>
+              <span className="text-[#263238]/70 font-semibold">Предоплата</span>
             </div>
             <div className="flex items-center gap-2">
               <span>🙏</span>

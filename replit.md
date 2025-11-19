@@ -113,6 +113,13 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-19**: Added client click navigation in calendar day details
+  - ✅ Implemented clickable client names in DayDetailsDialog
+  - ✅ Client name shows hover effect (underline + purple color)
+  - ✅ Clicking client name opens EditClientDialog
+  - ✅ Props threaded through: Dashboard → PaymentCalendar → DayDetailsDialog
+  - ✅ Optional onClientClick prop maintains backward compatibility
+
 - **2025-11-19**: Fixed manager dropdown not opening in AddClientDialog
   - ✅ Root cause #1: Radix UI Select doesn't work when value is empty string '' but no SelectItem has that value
     - Changed formData.manager initialization from '' to undefined

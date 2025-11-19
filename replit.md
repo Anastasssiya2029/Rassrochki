@@ -117,6 +117,7 @@ See `src/backend-example/README.md` for API documentation.
   - ✅ Prepayments (first payments) now marked with blue text color and flower emoji 🌸
   - ✅ Flower emoji visible in calendar preview (month view cells)
   - ✅ Blue color (blue-500) applied to paid prepayment amounts in tooltips and details
+  - ✅ Tooltip shows "Предоплата" (blue) instead of "Оплачено" (green) for prepayments
   - ✅ Updated calendar legend with prepayment indicators (blue dot + flower)
   - ✅ Added safe guards in isPrepayment() to handle missing prepaymentDate
   - ✅ Prepayment detection works for both paid and unpaid first payments

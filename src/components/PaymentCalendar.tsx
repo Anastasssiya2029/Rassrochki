@@ -274,7 +274,11 @@ export function PaymentCalendar({
                                     ? 'text-green-600' 
                                     : 'text-[#263238]/70'
                                 }`}>
-                                  {item.payment.paid ? 'Оплачено' : 'Ожидается'}
+                                  {item.isPrepayment && item.payment.paid 
+                                    ? 'Предоплата' 
+                                    : item.payment.paid 
+                                    ? 'Оплачено' 
+                                    : 'Ожидается'}
                                 </p>
                               </div>
                             </div>

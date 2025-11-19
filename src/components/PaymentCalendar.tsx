@@ -275,31 +275,24 @@ export function PaymentCalendar({
                               <div>
                                 <p className="text-[#2D1B69] flex items-center gap-1">
                                   {item.client.name}
-                                  {item.isPrepayment && <span>🌸</span>}
                                   {item.payment.originalDate && <span>🙏</span>}
                                 </p>
                                 <p className="text-[#263238]/70">{item.client.username}</p>
                               </div>
                               <div className="text-right">
                                 <p className={
-                                  item.isPrepayment && item.payment.paid 
-                                    ? 'text-blue-500' 
-                                    : item.payment.paid 
+                                  item.payment.paid 
                                     ? 'text-green-600' 
                                     : 'text-[#263238]'
                                 }>
                                   {(item.payment.amount || 0).toLocaleString('ru-RU')} ₽
                                 </p>
                                 <p className={`text-xs ${
-                                  item.isPrepayment && item.payment.paid 
-                                    ? 'text-blue-500' 
-                                    : item.payment.paid 
+                                  item.payment.paid 
                                     ? 'text-green-600' 
                                     : 'text-[#263238]/70'
                                 }`}>
-                                  {item.isPrepayment && item.payment.paid 
-                                    ? 'Предоплата' 
-                                    : item.payment.paid 
+                                  {item.payment.paid 
                                     ? 'Оплачено' 
                                     : 'Ожидается'}
                                 </p>
@@ -330,16 +323,8 @@ export function PaymentCalendar({
               <span className="text-[#263238]/70 font-semibold">Оплачено</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50" />
-              <span className="text-[#263238]/70 font-semibold">Предоплата</span>
-            </div>
-            <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-purple-600 shadow-sm shadow-purple-600/50" />
               <span className="text-[#263238]/70 font-semibold">Ожидается</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span>🌸</span>
-              <span className="text-[#263238]/70 font-semibold">Предоплата</span>
             </div>
             <div className="flex items-center gap-2">
               <span>🙏</span>

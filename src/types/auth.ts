@@ -25,4 +25,5 @@ export interface AuthContextType {
   register: (email: string, password: string, name: string, schoolName?: string) => Promise<void>;
   logout: () => void;
   selectSchool: (schoolId: string) => void;
+  clearSchool: () => void;
 }

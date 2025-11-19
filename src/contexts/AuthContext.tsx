@@ -209,6 +209,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const clearSchool = () => {
+    setSchool(null);
+    localStorage.removeItem('school');
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -219,6 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         selectSchool,
+        clearSchool,
       }}
     >
       {children}

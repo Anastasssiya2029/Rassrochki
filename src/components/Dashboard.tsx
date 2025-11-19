@@ -6,15 +6,14 @@ import { YearlyOverview } from './YearlyOverview';
 import { StatusLegend } from './StatusLegend';
 import { AddClientDialog } from './AddClientDialog';
 import { EditClientDialog } from './EditClientDialog';
-import { SchoolManagement } from './SchoolManagement';
 import { UserManagement } from './UserManagement';
 import { Button } from './ui/button';
-import { Plus, LogOut, User as UserIcon } from 'lucide-react';
+import { Plus, LogOut, User as UserIcon, Building2 } from 'lucide-react';
 import { Client } from '../types';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 import { motion } from 'motion/react';
 
 // Начальные данные клиентов
@@ -212,41 +211,15 @@ const INITIAL_CLIENTS: Client[] = [
 ];
 
 export function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, clearSchool } = useAuth();
   const [clients, setClients] = useState<Client[]>(INITIAL_CLIENTS);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [selectedView, setSelectedView] = useState<'clients' | 'calendar' | 'schools' | 'users'>(
-    user?.role === 'architect' ? 'schools' : 'clients'
-  );
+  const [selectedView, setSelectedView] = useState<'clients' | 'calendar' | 'users'>('clients');
   const [selectedManager, setSelectedManager] = useState<string>('all');
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  // Mock data for schools and users
-  const [schools, setSchools] = useState([
-    { 
-      id: '1', 
-      name: 'Онлайн-школа "Прогресс"', 
-      createdAt: new Date('2024-01-15'),
-      adminName: 'Владелец Прогресса',
-      adminEmail: 'admin@progress.com'
-    },
-    { 
-      id: '2', 
-      name: 'Академия цифровых навыков', 
-      createdAt: new Date('2024-03-20'),
-      adminName: 'Директор Академии',
-      adminEmail: 'admin@academy.com'
-    },
-    { 
-      id: '3', 
-      name: 'Школа программирования "Код"', 
-      createdAt: new Date('2024-06-10'),
-      adminName: 'Главный Код',
-      adminEmail: 'admin@code.com'
-    },
-  ]);
-
+  // Mock data for users
   const [schoolUsers, setSchoolUsers] = useState([
     {
       id: '3',
@@ -296,7 +269,7 @@ export function Dashboard() {
   }, []);
 
   // Получаем список менеджеров (фильтруем пустые значения)
-  const managers = Array.from(new Set(clients.map(c => c.manager).filter(m => m && m.trim() !== ''))).sort();
+  const managers = Array.from(new Set(clients.map(c => c.manager).filter((m): m is string => Boolean(m && m.trim())))).sort() as string[];
 
   // Фильтруем клиентов по менеджеру
   const filteredClients = selectedManager === 'all' 
@@ -434,24 +407,6 @@ export function Dashboard() {
     }, 100);
   };
 
-  // Handlers for schools
-  const handleAddSchool = (schoolData: { 
-    schoolName: string; 
-    adminName: string; 
-    adminEmail: string; 
-    adminPassword: string;
-  }) => {
-    const newSchool = {
-      id: Date.now().toString(),
-      name: schoolData.schoolName,
-      createdAt: new Date(),
-      adminName: schoolData.adminName,
-      adminEmail: schoolData.adminEmail,
-    };
-    
-    setSchools([...schools, newSchool]);
-  };
-
   // Handlers for users
   const handleAddUser = (userData: { 
     name: string; 
@@ -564,15 +519,27 @@ export function Dashboard() {
               </h1>
               <p className="text-gray-600 text-sm sm:text-base">Учет платежей и клиентов онлайн-школы</p>
             </div>
-            {canAddClients && (
-              <Button 
-                onClick={() => setIsAddDialogOpen(true)}
-                className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-3d-cosmic hover:shadow-3d-hover transition-all duration-400 hover:scale-105 hover:-translate-y-1 rounded-2xl px-4 sm:px-6 py-4 sm:py-6 w-full sm:w-auto touch-feedback"
-              >
-                <Plus className="w-5 h-5 mr-2" />
-                Добавить клиента
-              </Button>
-            )}
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {user?.role === 'architect' && (
+                <Button 
+                  onClick={clearSchool}
+                  variant="outline"
+                  className="border-purple-300 text-purple-700 hover:bg-purple-50 hover:border-purple-400 rounded-2xl px-4 sm:px-6 py-4 sm:py-6 w-full sm:w-auto touch-feedback transition-all duration-300"
+                >
+                  <Building2 className="w-5 h-5 mr-2" />
+                  Управление школами
+                </Button>
+              )}
+              {canAddClients && (
+                <Button 
+                  onClick={() => setIsAddDialogOpen(true)}
+                  className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:from-blue-600 hover:via-purple-600 hover:to-pink-600 text-white shadow-3d-cosmic hover:shadow-3d-hover transition-all duration-400 hover:scale-105 hover:-translate-y-1 rounded-2xl px-4 sm:px-6 py-4 sm:py-6 w-full sm:w-auto touch-feedback"
+                >
+                  <Plus className="w-5 h-5 mr-2" />
+                  Добавить клиента
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Manager Filter - только для не-менеджеров */}
@@ -640,23 +607,6 @@ export function Dashboard() {
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full shadow-lg shadow-purple-300/50" />
                 )}
               </button>
-              {user?.role === 'architect' && (
-                <>
-                  <button
-                    onClick={() => setSelectedView('schools')}
-                    className={`px-4 sm:px-6 py-2 sm:py-3 rounded-t-2xl transition-all duration-400 relative whitespace-nowrap text-sm sm:text-base ${
-                      selectedView === 'schools'
-                        ? 'text-gray-900'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
-                  >
-                    Школы
-                    {selectedView === 'schools' && (
-                      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-full shadow-lg shadow-purple-300/50" />
-                    )}
-                  </button>
-                </>
-              )}
               {(user?.role === 'architect' || user?.role === 'admin' || user?.role === 'assistant') && (
                 <button
                   onClick={() => setSelectedView('users')}
@@ -702,11 +652,6 @@ export function Dashboard() {
             />
             <YearlyOverview clients={displayedClients} onMonthClick={handleMonthClick} />
           </div>
-        ) : selectedView === 'schools' ? (
-          <SchoolManagement
-            schools={schools}
-            onAddSchool={handleAddSchool}
-          />
         ) : (
           <UserManagement
             users={schoolUsers}
@@ -730,10 +675,10 @@ export function Dashboard() {
 
       {editingClient && (
         <EditClientDialog
+          open={true}
+          onOpenChange={(open) => !open && setEditingClient(null)}
+          onEditClient={handleEditClient}
           client={editingClient}
-          onSave={handleEditClient}
-          onClose={() => setEditingClient(null)}
-          existingManagers={managers}
         />
       )}
     </div>

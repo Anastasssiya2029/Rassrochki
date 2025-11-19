@@ -128,7 +128,12 @@ See `src/backend-example/README.md` for API documentation.
   - ✅ Calendar cells now show only 2 aggregated sums per day (always visible):
     - "Ожидается" - sum of all unpaid payments (default color)
     - "Оплачено" - sum of all paid payments (green)
-  - ✅ Removed prepayment-specific display from calendar cells (no 🌸 flower emoji)
+  - ✅ Removed all prepayment-specific UI elements:
+    - No 🌸 flower emoji in calendar cells or tooltip
+    - No blue color for prepayments
+    - No "Предоплата" text in tooltip or legend
+  - ✅ Tooltip shows only: client name, amount, and status (Оплачено/Ожидается)
+  - ✅ Legend simplified: Оплачено, Ожидается, Перенесен, Сегодня
   - ✅ Both sums always displayed, even when 0 ₽
   - ✅ Added fallback handling (|| 0) for undefined/null payment amounts
   - ✅ Clean aggregated view for better clarity

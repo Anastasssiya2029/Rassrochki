@@ -33,6 +33,7 @@ interface DayDetailsDialogProps {
   onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string) => void;
   onPaymentAmountChange: (clientId: string, paymentIndex: number, newAmount: number) => void;
   onCommentChange: (clientId: string, paymentIndex: number, comment: string) => void;
+  onClientClick?: (client: Client) => void;
 }
 
 const formatDateLong = (date: Date) => {
@@ -49,7 +50,8 @@ export function DayDetailsDialog({
   onTogglePayment,
   onPostponePayment,
   onPaymentAmountChange,
-  onCommentChange
+  onCommentChange,
+  onClientClick
 }: DayDetailsDialogProps) {
   const [editingAmountIndex, setEditingAmountIndex] = useState<string | null>(null);
   const [editAmount, setEditAmount] = useState('');
@@ -154,7 +156,10 @@ export function DayDetailsDialog({
                       />
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h4 className="text-[#2D1B69]">
+                          <h4 
+                            className={`text-[#2D1B69] ${onClientClick ? 'cursor-pointer hover:underline hover:text-purple-600 transition-colors' : ''}`}
+                            onClick={() => onClientClick?.(item.client)}
+                          >
                             {item.client.name}
                           </h4>
                           {item.isPrepayment && <span>🌸</span>}

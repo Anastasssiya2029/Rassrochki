@@ -19,6 +19,7 @@ interface PaymentCalendarProps {
   onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string) => void;
   onPaymentAmountChange: (clientId: string, paymentIndex: number, newAmount: number) => void;
   onCommentChange: (clientId: string, paymentIndex: number, comment: string) => void;
+  onClientClick?: (client: Client) => void;
 }
 
 const getMonthName = (date: Date) => {
@@ -49,7 +50,8 @@ export function PaymentCalendar({
   onTogglePayment,
   onPostponePayment,
   onPaymentAmountChange,
-  onCommentChange
+  onCommentChange,
+  onClientClick
 }: PaymentCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(propCurrentMonth || new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -348,6 +350,7 @@ export function PaymentCalendar({
           onPostponePayment={onPostponePayment}
           onPaymentAmountChange={onPaymentAmountChange}
           onCommentChange={onCommentChange}
+          onClientClick={onClientClick}
         />
       )}
     </>

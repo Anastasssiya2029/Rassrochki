@@ -649,6 +649,7 @@ export function Dashboard() {
               onPostponePayment={handlePostponePayment}
               onPaymentAmountChange={handlePaymentAmountChange}
               onCommentChange={handleCommentChange}
+              onClientClick={setEditingClient}
             />
             <YearlyOverview clients={displayedClients} onMonthClick={handleMonthClick} />
           </div>

@@ -229,14 +229,47 @@ export function PaymentCalendar({
                             </div>
                           )}
                         </div>
-                        {dayTotal > 0 && (
-                          <div className="mt-1">
-                            <p className="text-[#2D1B69] break-words text-xs">
-                              {(dayTotal / 1000).toFixed(0)}k ₽
-                            </p>
-                            <p className="text-[#263238]/70 text-xs">
-                              {payments.length} шт
-                            </p>
+                        {payments.length > 0 && (
+                          <div className="mt-1 space-y-1">
+                            {(() => {
+                              // Сортируем: предоплаты всегда первыми
+                              const sortedPayments = [...payments].sort((a, b) => {
+                                if (a.isPrepayment && !b.isPrepayment) return -1;
+                                if (!a.isPrepayment && b.isPrepayment) return 1;
+                                return 0;
+                              });
+                              const displayPayments = sortedPayments.slice(0, 2);
+                              
+                              return (
+                                <>
+                                  {displayPayments.map((item, idx) => (
+                                    <div key={idx} className="text-xs">
+                                      <p className={
+                                        item.isPrepayment 
+                                          ? 'text-blue-500 font-medium' 
+                                          : item.payment.paid 
+                                          ? 'text-green-600' 
+                                          : 'text-[#2D1B69]'
+                                      }>
+                                        {(item.payment.amount || 0).toLocaleString('ru-RU')} ₽
+                                      </p>
+                                      <p className={`text-xs ${
+                                        item.isPrepayment 
+                                          ? 'text-blue-500' 
+                                          : 'text-[#263238]/70'
+                                      }`}>
+                                        {item.isPrepayment ? 'Предоплата' : item.payment.paid ? 'Оплачено' : 'Ожидается'}
+                                      </p>
+                                    </div>
+                                  ))}
+                                  {payments.length > 2 && (
+                                    <p className="text-[#263238]/70 text-xs">
+                                      +{payments.length - 2} ещё
+                                    </p>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </div>
                         )}
                       </div>

@@ -124,15 +124,17 @@ See `src/backend-example/README.md` for API documentation.
     - Dropdown now appears correctly above modal dialogs
   - ✅ Maintained backward compatibility with Input fallback when no managers exist
 
-- **2025-11-19**: Fixed prepayment amount display in calendar tooltip
+- **2025-11-19**: Enhanced prepayment display in calendar cells and tooltips
+  - ✅ Calendar cells now show individual payment amounts and status (not just totals)
+  - ✅ Prepayments ALWAYS displayed first in calendar cells (sorted to top)
+  - ✅ Each payment shows: amount (blue for prepayments) + status label "Предоплата"
+  - ✅ Up to 2 payments per cell with "+N ещё" overflow indicator
   - ✅ Added fallback handling (|| 0) for undefined/null payment amounts
   - ✅ Prevents tooltip rendering issues when amount data is missing
-  - ✅ All tooltips now display payment amount and status regardless of data completeness
   - ✅ Prepayments (first payments) marked with blue text color and flower emoji 🌸
   - ✅ Flower emoji visible in calendar preview (month view cells)
-  - ✅ Blue color (blue-500) applied to paid prepayment amounts in tooltips and details
-  - ✅ Tooltip shows "Предоплата" (blue) with amount for paid prepayments
-  - ✅ Unpaid prepayments show amount and "Ожидается" status in standard color
+  - ✅ Blue color (blue-500) applied to prepayment amounts in cells and tooltips
+  - ✅ Tooltip shows "Предоплата" (blue) with amount for prepayments
   - ✅ Updated calendar legend with prepayment indicators (blue dot + flower)
   - ✅ Added safe guards in isPrepayment() to handle missing prepaymentDate
 

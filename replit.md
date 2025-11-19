@@ -113,6 +113,14 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-19**: Implemented prepayment visual distinction in payment calendar
+  - ✅ Prepayments (first payments) now marked with blue text color and flower emoji 🌸
+  - ✅ Flower emoji visible in calendar preview (month view cells)
+  - ✅ Blue color (blue-500) applied to paid prepayment amounts in tooltips and details
+  - ✅ Updated calendar legend with prepayment indicators (blue dot + flower)
+  - ✅ Added safe guards in isPrepayment() to handle missing prepaymentDate
+  - ✅ Prepayment detection works for both paid and unpaid first payments
+
 - **2025-11-19**: Implemented architect role isolation - schools managed only in dedicated admin panel
   - ✅ Removed "Школы" tab from Dashboard - architect sees same interface as other roles when working in a school
   - ✅ Added "Управление школами" button in Dashboard header for architects

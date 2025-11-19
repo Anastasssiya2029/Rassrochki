@@ -295,8 +295,8 @@ export function Dashboard() {
     }));
   }, []);
 
-  // Получаем список менеджеров
-  const managers = Array.from(new Set(clients.map(c => c.manager))).sort();
+  // Получаем список менеджеров (фильтруем пустые значения)
+  const managers = Array.from(new Set(clients.map(c => c.manager).filter(m => m && m.trim() !== ''))).sort();
 
   // Фильтруем клиентов по менеджеру
   const filteredClients = selectedManager === 'all' 

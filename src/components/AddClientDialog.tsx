@@ -11,6 +11,7 @@ import {
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 interface AddClientDialogProps {
   open: boolean;
@@ -44,6 +45,12 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Валидация менеджера
+    if (!isManager && (!formData.manager || formData.manager.trim() === '')) {
+      alert('Пожалуйста, выберите менеджера');
+      return;
+    }
     
     const totalAmount = parseFloat(formData.totalAmount);
     const prepayment = parseFloat(formData.prepayment);
@@ -234,6 +241,39 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
               />
             </div>
           </div>
+
+          {!isManager && (
+            <div className="space-y-2">
+              <Label htmlFor="manager" className="text-gray-900 text-sm sm:text-base">Менеджер *</Label>
+              {existingManagers.length > 0 ? (
+                <Select
+                  value={formData.manager}
+                  onValueChange={(value) => setFormData({ ...formData, manager: value })}
+                  required
+                >
+                  <SelectTrigger className="rounded-2xl border-blue-200/50 bg-white/90 focus:border-purple-400 transition-colors touch-target">
+                    <SelectValue placeholder="Выберите менеджера" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {existingManagers.map((manager) => (
+                      <SelectItem key={manager} value={manager}>
+                        {manager}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  id="manager"
+                  value={formData.manager}
+                  onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
+                  required
+                  placeholder="Введите имя менеджера"
+                  className="rounded-2xl border-blue-200/50 bg-white/90 focus:border-purple-400 transition-colors touch-target"
+                />
+              )}
+            </div>
+          )}
 
           <div className="flex justify-end gap-3 pt-4">
             <Button 

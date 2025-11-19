@@ -113,6 +113,16 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-19**: Fixed critical white-screen bug in client management
+  - ✅ **Bug Fix**: Resolved Radix UI Select crash caused by empty manager values
+  - ✅ Added filtering in Dashboard.tsx to remove empty/falsy manager values before rendering Select
+  - ✅ Enhanced AddClientDialog.tsx with smart manager field:
+    - Shows Select dropdown when existing managers are available
+    - Falls back to text Input when no managers exist (fresh environment)
+    - Validates manager field is non-empty before submission
+  - ✅ Verified EditClientDialog.tsx uses safe Input component (no regression)
+  - ✅ All LSP diagnostics cleared
+
 - **2025-11-18**: Full stack setup with external PostgreSQL completed
   - ✅ Configured Vite for Replit (port 5000, host 0.0.0.0, allowedHosts)
   - ✅ Created Frontend workflow

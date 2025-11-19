@@ -30,7 +30,18 @@ const formatDateForInput = (date: Date) => {
 };
 
 export function AddClientDialog({ open, onOpenChange, onAddClient, existingManagers, isManager = false, managerName }: AddClientDialogProps) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    username: string;
+    tariff: string;
+    totalAmount: string;
+    prepayment: string;
+    prepaymentDate: string;
+    installmentStart: string;
+    installmentEnd: string;
+    manager: string | undefined;
+    monthlyPayments: string;
+  }>({
     name: '',
     username: '',
     tariff: '',
@@ -39,7 +50,7 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
     prepaymentDate: formatDateForInput(new Date()),
     installmentStart: formatDateForInput(new Date()),
     installmentEnd: formatDateForInput(new Date()),
-    manager: isManager ? managerName : '',
+    manager: isManager && managerName ? managerName : undefined,
     monthlyPayments: '6'
   });
 
@@ -48,7 +59,7 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
     
     // Валидация менеджера
     if (!isManager && (!formData.manager || formData.manager.trim() === '')) {
-      alert('Пожалуйста, выберите менеджера');
+      alert('Пожалуйста, выберите или введите менеджера');
       return;
     }
     
@@ -109,7 +120,7 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
       prepaymentDate: formatDateForInput(new Date()),
       installmentStart: formatDateForInput(new Date()),
       installmentEnd: formatDateForInput(new Date()),
-      manager: isManager ? managerName : '',
+      manager: isManager && managerName ? managerName : undefined,
       monthlyPayments: '6'
     });
   };
@@ -247,7 +258,7 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
               <Label htmlFor="manager" className="text-gray-900 text-sm sm:text-base">Менеджер *</Label>
               {existingManagers.length > 0 ? (
                 <Select
-                  value={formData.manager}
+                  value={formData.manager || undefined}
                   onValueChange={(value) => setFormData({ ...formData, manager: value })}
                   required
                 >
@@ -265,7 +276,7 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
               ) : (
                 <Input
                   id="manager"
-                  value={formData.manager}
+                  value={formData.manager || ''}
                   onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
                   required
                   placeholder="Введите имя менеджера"

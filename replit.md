@@ -113,6 +113,12 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-20**: Fixed SchoolSelector import errors
+  - ✅ Fixed incorrect sonner import: `sonner@2.0.3` → `sonner`
+  - ✅ Added missing React import for JSX compilation
+  - ✅ Resolved all LSP diagnostics (39 errors fixed)
+  - ✅ SchoolSelector now compiles without errors
+
 - **2025-11-20**: Fixed Select dropdown not opening in manager filter
   - ✅ Root cause: Invalid TailwindCSS syntax + style prop merging issue in select.tsx
     - Original code: `max-h-(--radix-select-content-available-height)` (incorrect syntax)

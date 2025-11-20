@@ -548,8 +548,21 @@ export function Dashboard() {
               <Label htmlFor="global-manager-filter" className="whitespace-nowrap text-gray-900 text-sm sm:text-base">
                 Менеджер:
               </Label>
-              <Select value={selectedManager} onValueChange={setSelectedManager}>
-                <SelectTrigger id="global-manager-filter" className="w-full sm:w-64 rounded-2xl border-gray-200 bg-white text-gray-900">
+              <Select 
+                value={selectedManager} 
+                onValueChange={(value) => {
+                  console.log('🔵 Select onValueChange:', value);
+                  setSelectedManager(value);
+                }}
+                onOpenChange={(open) => {
+                  console.log('🟢 Select onOpenChange:', open);
+                }}
+              >
+                <SelectTrigger 
+                  id="global-manager-filter" 
+                  className="w-full sm:w-64 rounded-2xl border-gray-200 bg-white text-gray-900"
+                  onClick={() => console.log('🟡 SelectTrigger onClick fired')}
+                >
                   <SelectValue placeholder="Выберите менеджера" />
                 </SelectTrigger>
                 <SelectContent>

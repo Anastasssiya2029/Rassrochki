@@ -113,6 +113,13 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-20**: Fixed calendar "Ожидается" sum calculation logic
+  - ✅ "Ожидается" now shows total sum of ALL payments on a day (fixed amount)
+  - ✅ Previously showed only unpaid payments (decreased when marking as paid)
+  - ✅ Changed from `unpaidTotal` to `totalExpected` calculation
+  - ✅ "Оплачено" remains unchanged (sum of paid payments only)
+  - ✅ Business logic: Expected = fixed total, Paid = grows as payments are marked paid
+
 - **2025-11-19**: Added client click navigation in calendar day details
   - ✅ Implemented clickable client names in DayDetailsDialog
   - ✅ Client name shows hover effect (underline + purple color)

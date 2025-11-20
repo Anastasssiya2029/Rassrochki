@@ -1,11 +1,11 @@
-import { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useAuth, MOCK_SCHOOLS } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Building2, ChevronRight, Settings } from 'lucide-react';
 import { SchoolManagement } from './SchoolManagement';
 import { apiService } from '../services/api';
 import { useMockApi } from '../utils/env';
-import { toast } from 'sonner@2.0.3';
+import { toast } from 'sonner';
 
 interface School {
   id: string;

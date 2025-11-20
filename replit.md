@@ -114,11 +114,15 @@ See `src/backend-example/README.md` for API documentation.
 
 ## Recent Changes
 - **2025-11-20**: Fixed Select dropdown not opening in manager filter
-  - ✅ Root cause: Invalid TailwindCSS syntax in select.tsx
-    - `max-h-(--radix-select-content-available-height)` was invalid syntax
-    - `origin-(--radix-select-content-transform-origin)` was invalid syntax
-  - ✅ Replaced with valid Tailwind classes: `max-h-96`
-  - ✅ Select dropdown now opens and displays properly
+  - ✅ Root cause: Invalid TailwindCSS syntax + style prop merging issue in select.tsx
+    - Original code: `max-h-(--radix-select-content-available-height)` (incorrect syntax)
+    - Original code: `origin-(--radix-select-content-transform-origin)` (incorrect syntax)
+  - ✅ Solution implemented:
+    - Used correct TailwindCSS arbitrary value: `max-h-[var(--radix-select-content-available-height)]`
+    - Used inline style for transform-origin (not supported by Tailwind arbitrary values)
+    - Extracted `style` prop and merged safely to prevent override
+  - ✅ Radix UI animation variables now work correctly
+  - ✅ Select dropdown opens, animates, and positions properly
   - ✅ Manager filter in Dashboard calendar now fully functional
 
 - **2025-11-20**: Fixed calendar "Ожидается" sum calculation logic

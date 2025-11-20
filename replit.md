@@ -113,6 +113,14 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-20**: Fixed Select dropdown not opening in manager filter
+  - ✅ Root cause: Invalid TailwindCSS syntax in select.tsx
+    - `max-h-(--radix-select-content-available-height)` was invalid syntax
+    - `origin-(--radix-select-content-transform-origin)` was invalid syntax
+  - ✅ Replaced with valid Tailwind classes: `max-h-96`
+  - ✅ Select dropdown now opens and displays properly
+  - ✅ Manager filter in Dashboard calendar now fully functional
+
 - **2025-11-20**: Fixed calendar "Ожидается" sum calculation logic
   - ✅ "Ожидается" now shows total sum of ALL payments on a day (fixed amount)
   - ✅ Previously showed only unpaid payments (decreased when marking as paid)

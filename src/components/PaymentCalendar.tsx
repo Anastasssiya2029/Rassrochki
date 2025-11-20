@@ -233,19 +233,18 @@ export function PaymentCalendar({
                         {payments.length > 0 && (
                           <div className="mt-1 space-y-1">
                             {(() => {
-                              const paidTotal = payments
-                                .filter(p => p.payment.paid)
+                              const totalExpected = payments
                                 .reduce((sum, p) => sum + (p.payment.amount || 0), 0);
                               
-                              const unpaidTotal = payments
-                                .filter(p => !p.payment.paid)
+                              const paidTotal = payments
+                                .filter(p => p.payment.paid)
                                 .reduce((sum, p) => sum + (p.payment.amount || 0), 0);
                               
                               return (
                                 <>
                                   <div className="text-xs">
                                     <p className="text-[#2D1B69] font-medium">
-                                      {unpaidTotal.toLocaleString('ru-RU')} ₽
+                                      {totalExpected.toLocaleString('ru-RU')} ₽
                                     </p>
                                     <p className="text-[#263238]/70 text-xs">
                                       Ожидается

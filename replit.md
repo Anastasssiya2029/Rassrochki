@@ -113,23 +113,28 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-20**: **CRITICAL FIX**: Fixed Radix UI Select components not working (dropdowns not opening)
+  - ✅ **Root Cause**: All Select components were plain functions WITHOUT React.forwardRef
+    - Radix UI Select REQUIRES refs to be forwarded to DOM elements
+    - Without forwardRef, refs resolve to null → Radix can't attach event listeners → dropdowns never open
+    - This is why previous CSS/styling fixes didn't work - the problem was at React ref level
+  - ✅ **Solution**: Complete rewrite of src/components/ui/select.tsx
+    - Converted ALL components to use React.forwardRef pattern (SelectTrigger, SelectContent, SelectItem, etc.)
+    - Added displayName for React DevTools compatibility
+    - Maintained all custom styling (data-slot, TailwindCSS, z-index, animations)
+    - Reordered SelectScrollUpButton/SelectScrollDownButton before SelectContent (they're used inside it)
+  - ✅ **Impact**: Fixes ALL Select dropdowns in the app
+    - Manager filter in Dashboard (PRIMARY FIX)
+    - Manager dropdown in AddClientDialog
+    - Any future Select components
+  - ✅ Validated by architect - refs properly forwarded, no styling regressions
+  - ✅ **Lesson**: Radix UI primitives MUST use forwardRef - plain function wrappers break functionality
+
 - **2025-11-20**: Fixed SchoolSelector import errors
   - ✅ Fixed incorrect sonner import: `sonner@2.0.3` → `sonner`
   - ✅ Added missing React import for JSX compilation
   - ✅ Resolved all LSP diagnostics (39 errors fixed)
   - ✅ SchoolSelector now compiles without errors
-
-- **2025-11-20**: Fixed Select dropdown not opening in manager filter
-  - ✅ Root cause: Invalid TailwindCSS syntax + style prop merging issue in select.tsx
-    - Original code: `max-h-(--radix-select-content-available-height)` (incorrect syntax)
-    - Original code: `origin-(--radix-select-content-transform-origin)` (incorrect syntax)
-  - ✅ Solution implemented:
-    - Used correct TailwindCSS arbitrary value: `max-h-[var(--radix-select-content-available-height)]`
-    - Used inline style for transform-origin (not supported by Tailwind arbitrary values)
-    - Extracted `style` prop and merged safely to prevent override
-  - ✅ Radix UI animation variables now work correctly
-  - ✅ Select dropdown opens, animates, and positions properly
-  - ✅ Manager filter in Dashboard calendar now fully functional
 
 - **2025-11-20**: Fixed calendar "Ожидается" sum calculation logic
   - ✅ "Ожидается" now shows total sum of ALL payments on a day (fixed amount)

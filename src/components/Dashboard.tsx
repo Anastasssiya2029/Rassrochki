@@ -550,11 +550,16 @@ export function Dashboard() {
               </Label>
               <Select 
                 value={selectedManager} 
-                onValueChange={setSelectedManager}
+                onValueChange={(value) => {
+                  console.log('Manager selected:', value);
+                  setSelectedManager(value);
+                }}
+                modal={true}
               >
                 <SelectTrigger 
                   id="global-manager-filter" 
                   className="w-full sm:w-64 rounded-2xl border-gray-200 bg-white text-gray-900"
+                  onClick={() => console.log('SelectTrigger clicked')}
                 >
                   <SelectValue placeholder="Выберите менеджера" />
                 </SelectTrigger>

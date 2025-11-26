@@ -542,26 +542,19 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Manager Filter - только для не-менеджеров */}
-          {user?.role !== 'manager' && (
+          {/* Manager Filter - только для не-менеджеров и не на вкладке Пользователи */}
+          {user?.role !== 'manager' && selectedView !== 'users' && (
             <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
               <Label htmlFor="global-manager-filter" className="whitespace-nowrap text-gray-900 text-sm sm:text-base">
                 Менеджер:
               </Label>
               <Select 
                 value={selectedManager} 
-                onValueChange={(value) => {
-                  console.log('🔵 Select onValueChange:', value);
-                  setSelectedManager(value);
-                }}
-                onOpenChange={(open) => {
-                  console.log('🟢 Select onOpenChange:', open);
-                }}
+                onValueChange={setSelectedManager}
               >
                 <SelectTrigger 
                   id="global-manager-filter" 
                   className="w-full sm:w-64 rounded-2xl border-gray-200 bg-white text-gray-900"
-                  onClick={() => console.log('🟡 SelectTrigger onClick fired')}
                 >
                   <SelectValue placeholder="Выберите менеджера" />
                 </SelectTrigger>

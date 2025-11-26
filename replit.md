@@ -113,6 +113,20 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-26**: **CRITICAL FIX**: Fixed Select dropdown visibility issue (dropdown opened but was invisible)
+  - ✅ **Root Cause**: CSS custom properties (`--popover`, `--popover-foreground`, `--accent`) were undefined in project
+    - `bg-popover` rendered as transparent background → dropdown invisible
+    - `text-popover-foreground` rendered as invisible text → items not visible
+    - Viewport height constraint `h-[var(--radix-select-trigger-height)]` restricted dropdown height
+  - ✅ **Solution**: Replaced undefined CSS variables with explicit Tailwind classes in select.tsx:
+    - SelectContent: `bg-white text-gray-900 border-gray-200` + `max-h-96`
+    - SelectItem: `focus:bg-purple-100 focus:text-gray-900 hover:bg-gray-100 text-gray-700`
+    - Added `cursor-pointer` for better UX
+  - ✅ **Dashboard improvements**:
+    - Manager filter now hidden on "Пользователи" (Users) tab - only visible on Клиенты and Календарь tabs
+    - Removed all debug console.log statements
+  - ✅ Validated by architect - dropdown now visible with proper styling
+
 - **2025-11-20**: **CRITICAL FIX**: Fixed Radix UI Select components not working (dropdowns not opening)
   - ✅ **Root Cause**: All Select components were plain functions WITHOUT React.forwardRef
     - Radix UI Select REQUIRES refs to be forwarded to DOM elements

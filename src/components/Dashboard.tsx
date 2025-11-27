@@ -11,7 +11,6 @@ import { Button } from './ui/button';
 import { Plus, LogOut, User as UserIcon, Building2 } from 'lucide-react';
 import { Client } from '../types';
 import { Label } from './ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'sonner';
 import { motion } from 'motion/react';
@@ -548,30 +547,19 @@ export function Dashboard() {
               <Label htmlFor="global-manager-filter" className="whitespace-nowrap text-gray-900 text-sm sm:text-base">
                 Менеджер:
               </Label>
-              <Select 
-                value={selectedManager} 
-                onValueChange={(value) => {
-                  console.log('Manager selected:', value);
-                  setSelectedManager(value);
-                }}
-                modal={true}
+              <select
+                id="global-manager-filter"
+                value={selectedManager}
+                onChange={(e) => setSelectedManager(e.target.value)}
+                className="w-full sm:w-64 h-9 px-3 py-2 rounded-2xl border border-gray-200 bg-white text-gray-900 text-sm cursor-pointer hover:border-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/30 focus:outline-none transition-all"
               >
-                <SelectTrigger 
-                  id="global-manager-filter" 
-                  className="w-full sm:w-64 rounded-2xl border-gray-200 bg-white text-gray-900"
-                  onClick={() => console.log('SelectTrigger clicked')}
-                >
-                  <SelectValue placeholder="Выберите менеджера" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все менеджеры</SelectItem>
-                  {managers.map(manager => (
-                    <SelectItem key={manager} value={manager}>
-                      {manager}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <option value="all">Все менеджеры</option>
+                {managers.map(manager => (
+                  <option key={manager} value={manager}>
+                    {manager}
+                  </option>
+                ))}
+              </select>
               {selectedManager !== 'all' && (
                 <span className="text-gray-600 text-sm">
                   Показаны данные только по менеджеру: {selectedManager}

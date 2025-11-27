@@ -10,7 +10,6 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { Check } from 'lucide-react';
 
 interface PostponePaymentDialogProps {
   open: boolean;
@@ -36,11 +35,13 @@ export function PostponePaymentDialog({
 }: PostponePaymentDialogProps) {
   const [newDate, setNewDate] = useState(formatDateForInput(currentDate));
   const [reason, setReason] = useState('');
-  const [isOverdue, setIsOverdue] = useState(true);
+  const [isOverdue, setIsOverdue] = useState(false);
 
   useEffect(() => {
     if (open) {
       setNewDate(formatDateForInput(currentDate));
+      setReason('');
+      setIsOverdue(false);
     }
   }, [open, currentDate]);
 
@@ -54,8 +55,6 @@ export function PostponePaymentDialog({
     const parsedDate = new Date(newDate + 'T00:00:00');
     onPostpone(parsedDate, reason, isOverdue);
     onOpenChange(false);
-    setReason('');
-    setIsOverdue(true);
   };
 
   return (
@@ -82,6 +81,31 @@ export function PostponePaymentDialog({
               Текущая дата платежа: {formatDateForInput(currentDate)}
             </p>
           </div>
+
+          <label 
+            className={`flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all duration-200 ${
+              isOverdue 
+                ? 'bg-orange-100 border-2 border-orange-400' 
+                : 'bg-gray-50 border-2 border-gray-200 hover:bg-gray-100'
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={isOverdue}
+              onChange={(e) => setIsOverdue(e.target.checked)}
+              className="w-5 h-5 accent-orange-500 cursor-pointer"
+            />
+            <div className="flex flex-col gap-0.5">
+              <span className="text-gray-900 font-medium">
+                Это просрочка
+              </span>
+              <span className="text-xs text-gray-500">
+                {isOverdue 
+                  ? "Перенос будет записан в историю просрочек" 
+                  : "Плановый перенос, не влияет на статус клиента"}
+              </span>
+            </div>
+          </label>
           
           {isOverdue && (
             <div className="space-y-3">
@@ -96,33 +120,6 @@ export function PostponePaymentDialog({
               />
             </div>
           )}
-
-          <div 
-            className={`flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all duration-200 ${
-              isOverdue 
-                ? 'bg-orange-100 border-2 border-orange-400' 
-                : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
-            }`}
-            onClick={() => setIsOverdue(!isOverdue)}
-          >
-            <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 ${
-              isOverdue 
-                ? 'bg-orange-500 border-2 border-orange-600' 
-                : 'bg-white border-2 border-gray-300'
-            }`}>
-              {isOverdue && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-gray-900 font-medium">
-                Это просрочка
-              </span>
-              <span className="text-xs text-gray-500">
-                {isOverdue 
-                  ? "Перенос будет записан в историю просрочек" 
-                  : "Плановый перенос, не влияет на статус клиента"}
-              </span>
-            </div>
-          </div>
 
           <div className="flex justify-end gap-3 pt-4">
             <Button 

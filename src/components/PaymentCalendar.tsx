@@ -16,7 +16,7 @@ interface PaymentCalendarProps {
   currentMonth?: Date;
   onMonthChange?: (month: Date) => void;
   onTogglePayment: (clientId: string, paymentIndex: number) => void;
-  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string) => void;
+  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string, isOverdue?: boolean) => void;
   onPaymentAmountChange: (clientId: string, paymentIndex: number, newAmount: number) => void;
   onCommentChange: (clientId: string, paymentIndex: number, comment: string) => void;
   onClientClick?: (client: Client) => void;

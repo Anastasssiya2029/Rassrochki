@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,11 +10,12 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
+import { Checkbox } from './ui/checkbox';
 
 interface PostponePaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onPostpone: (newDate: Date, reason: string) => void;
+  onPostpone: (newDate: Date, reason: string, isOverdue: boolean) => void;
   currentDate: Date;
   amount: number;
 }
@@ -33,14 +34,22 @@ export function PostponePaymentDialog({
   currentDate,
   amount
 }: PostponePaymentDialogProps) {
-  const [newDate, setNewDate] = useState(formatDateForInput(new Date()));
+  const [newDate, setNewDate] = useState(formatDateForInput(currentDate));
   const [reason, setReason] = useState('');
+  const [isOverdue, setIsOverdue] = useState(true);
+
+  useEffect(() => {
+    if (open) {
+      setNewDate(formatDateForInput(currentDate));
+    }
+  }, [open, currentDate]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onPostpone(new Date(newDate), reason);
+    onPostpone(new Date(newDate), reason, isOverdue);
     onOpenChange(false);
     setReason('');
+    setIsOverdue(true);
   };
 
   return (
@@ -49,8 +58,7 @@ export function PostponePaymentDialog({
         <DialogHeader>
           <DialogTitle className="text-gray-900">Перенос платежа</DialogTitle>
           <DialogDescription className="text-gray-600">
-            Платеж на сумму {amount.toLocaleString('ru-RU')} ₽ будет перенесен. 
-            Просрочка будет записана.
+            Платеж на сумму {amount.toLocaleString('ru-RU')} ₽ будет перенесен.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-6 mt-6">
@@ -62,9 +70,11 @@ export function PostponePaymentDialog({
               value={newDate}
               onChange={(e) => setNewDate(e.target.value)}
               required
-              min={formatDateForInput(new Date())}
               className="rounded-2xl h-12"
             />
+            <p className="text-xs text-gray-500">
+              Текущая дата платежа: {formatDateForInput(currentDate)}
+            </p>
           </div>
           
           <div className="space-y-3">
@@ -78,6 +88,25 @@ export function PostponePaymentDialog({
               rows={4}
               className="rounded-2xl resize-none"
             />
+          </div>
+
+          <div className="flex items-center gap-3 p-4 rounded-2xl bg-orange-50/50 border border-orange-100">
+            <Checkbox
+              id="isOverdue"
+              checked={isOverdue}
+              onCheckedChange={(checked) => setIsOverdue(checked === true)}
+              className="border-orange-300 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+            />
+            <div className="flex flex-col gap-0.5">
+              <Label htmlFor="isOverdue" className="text-gray-900 cursor-pointer font-medium">
+                Это просрочка
+              </Label>
+              <span className="text-xs text-gray-500">
+                {isOverdue 
+                  ? "Перенос будет записан в историю просрочек" 
+                  : "Плановый перенос, не влияет на статус клиента"}
+              </span>
+            </div>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">

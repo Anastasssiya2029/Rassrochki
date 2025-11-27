@@ -5,7 +5,7 @@ import { ClientCard } from './ClientCard';
 interface ClientListProps {
   clients: Client[];
   onTogglePayment: (clientId: string, paymentIndex: number) => void;
-  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string) => void;
+  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string, isOverdue?: boolean) => void;
   onEditClient: (client: Client) => void;
   onPaymentAmountChange: (clientId: string, paymentIndex: number, newAmount: number) => void;
 }

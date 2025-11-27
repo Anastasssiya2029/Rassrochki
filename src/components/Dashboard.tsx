@@ -297,33 +297,45 @@ export function Dashboard() {
     );
   };
 
-  const handlePostponePayment = (clientId: string, paymentIndex: number, newDate: Date, reason: string) => {
+  const handlePostponePayment = (clientId: string, paymentIndex: number, newDate: Date, reason: string, isOverdue: boolean = true) => {
     setClients(prevClients =>
       prevClients.map(client => {
         if (client.id === clientId) {
           const payment = client.payments[paymentIndex];
           const updatedPayments = [...client.payments];
           
-          updatedPayments[paymentIndex] = {
-            ...payment,
-            date: newDate,
-            originalDate: payment.originalDate || payment.date,
-            postponeReason: reason
-          };
+          if (isOverdue) {
+            updatedPayments[paymentIndex] = {
+              ...payment,
+              date: newDate,
+              originalDate: payment.originalDate || payment.date,
+              postponeReason: reason
+            };
 
-          const overdueRecord = {
-            originalDate: payment.originalDate || payment.date,
-            postponedDate: newDate,
-            reason,
-            amount: payment.amount
-          };
+            const overdueRecord = {
+              originalDate: payment.originalDate || payment.date,
+              postponedDate: newDate,
+              reason,
+              amount: payment.amount
+            };
 
-          return {
-            ...client,
-            payments: updatedPayments,
-            overdueHistory: [...client.overdueHistory, overdueRecord],
-            status: 'unreliable' as const
-          };
+            return {
+              ...client,
+              payments: updatedPayments,
+              overdueHistory: [...client.overdueHistory, overdueRecord],
+              status: 'unreliable' as const
+            };
+          } else {
+            updatedPayments[paymentIndex] = {
+              ...payment,
+              date: newDate
+            };
+
+            return {
+              ...client,
+              payments: updatedPayments
+            };
+          }
         }
         return client;
       })

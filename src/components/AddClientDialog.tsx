@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Client } from '../types';
 import {
   Dialog,
@@ -12,6 +12,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Calculator } from 'lucide-react';
 
 interface AddClientDialogProps {
   open: boolean;
@@ -53,6 +54,26 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
     manager: isManager && managerName ? managerName : undefined,
     monthlyPayments: '6'
   });
+
+  const calculateEndDate = () => {
+    if (!formData.installmentStart || !formData.monthlyPayments) return;
+    
+    const monthlyCount = parseInt(formData.monthlyPayments);
+    if (isNaN(monthlyCount) || monthlyCount < 1) return;
+    
+    const startDate = new Date(formData.installmentStart);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + monthlyCount - 1);
+    
+    setFormData(prev => ({
+      ...prev,
+      installmentEnd: formatDateForInput(endDate)
+    }));
+  };
+
+  useEffect(() => {
+    calculateEndDate();
+  }, [formData.installmentStart, formData.monthlyPayments]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,15 +250,30 @@ export function AddClientDialog({ open, onOpenChange, onAddClient, existingManag
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="installmentEnd" className="text-gray-900 text-sm sm:text-base">Конец рассрочки</Label>
-              <Input
-                id="installmentEnd"
-                type="date"
-                value={formData.installmentEnd}
-                onChange={(e) => setFormData({ ...formData, installmentEnd: e.target.value })}
-                required
-                className="rounded-2xl border-blue-200/50 bg-white/90 focus:border-purple-400 transition-colors touch-target"
-              />
+              <Label htmlFor="installmentEnd" className="text-gray-900 text-sm sm:text-base flex items-center gap-2">
+                Конец рассрочки
+                <span className="text-xs text-purple-500 font-normal">(авто)</span>
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="installmentEnd"
+                  type="date"
+                  value={formData.installmentEnd}
+                  onChange={(e) => setFormData({ ...formData, installmentEnd: e.target.value })}
+                  required
+                  className="rounded-2xl border-blue-200/50 bg-purple-50/50 focus:border-purple-400 transition-colors touch-target flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={calculateEndDate}
+                  title="Пересчитать дату окончания"
+                  className="rounded-2xl border-purple-200 hover:bg-purple-50 hover:border-purple-400 h-10 w-10"
+                >
+                  <Calculator className="w-4 h-4 text-purple-500" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="monthlyPayments" className="text-gray-900 text-sm sm:text-base">Кол-во платежей</Label>

@@ -13,7 +13,7 @@ import { hapticFeedback } from '../utils/haptic';
 interface ClientCardProps {
   client: Client;
   onTogglePayment: (clientId: string, paymentIndex: number) => void;
-  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string) => void;
+  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string, isOverdue?: boolean) => void;
   onEditClient: (client: Client) => void;
   onPaymentAmountChange: (clientId: string, paymentIndex: number, newAmount: number) => void;
 }
@@ -50,9 +50,9 @@ export function ClientCard({ client, onTogglePayment, onPostponePayment, onEditC
     setPostponeDialogOpen(true);
   };
 
-  const handlePostpone = (newDate: Date, reason: string) => {
+  const handlePostpone = (newDate: Date, reason: string, isOverdue: boolean) => {
     if (selectedPaymentIndex !== null) {
-      onPostponePayment(client.id, selectedPaymentIndex, newDate, reason);
+      onPostponePayment(client.id, selectedPaymentIndex, newDate, reason, isOverdue);
     }
   };
 

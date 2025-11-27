@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { DialogDescription } from './ui/dialog';
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { Client } from '../types';
 import { Button } from './ui/button';
 import { Textarea } from './ui/textarea';
@@ -7,7 +7,6 @@ import { Label } from './ui/label';
 import { Input } from './ui/input';
 import { Calendar, DollarSign } from 'lucide-react';
 import { Checkbox } from './ui/checkbox';
-import { useState } from 'react';
 import { PostponePaymentDialog } from './PostponePaymentDialog';
 
 interface DayPayment {
@@ -30,7 +29,7 @@ interface DayDetailsDialogProps {
   date: Date;
   payments: DayPayment[];
   onTogglePayment: (clientId: string, paymentIndex: number) => void;
-  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string) => void;
+  onPostponePayment: (clientId: string, paymentIndex: number, newDate: Date, reason: string, isOverdue?: boolean) => void;
   onPaymentAmountChange: (clientId: string, paymentIndex: number, newAmount: number) => void;
   onCommentChange: (clientId: string, paymentIndex: number, comment: string) => void;
   onClientClick?: (client: Client) => void;
@@ -91,9 +90,9 @@ export function DayDetailsDialog({
     setPostponeDialogOpen(true);
   };
 
-  const handlePostpone = (newDate: Date, reason: string) => {
+  const handlePostpone = (newDate: Date, reason: string, isOverdue: boolean) => {
     if (selectedPayment) {
-      onPostponePayment(selectedPayment.client.id, selectedPayment.paymentIndex, newDate, reason);
+      onPostponePayment(selectedPayment.client.id, selectedPayment.paymentIndex, newDate, reason, isOverdue);
     }
   };
 

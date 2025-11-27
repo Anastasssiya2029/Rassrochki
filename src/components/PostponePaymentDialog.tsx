@@ -99,11 +99,11 @@ export function PostponePaymentDialog({
               <span className="text-gray-900 font-medium">
                 Это просрочка
               </span>
-              <span className="text-xs text-gray-500">
-                {isOverdue 
-                  ? "Перенос будет записан в историю просрочек" 
-                  : "Плановый перенос, не влияет на статус клиента"}
-              </span>
+              {isOverdue && (
+                <span className="text-xs text-gray-500">
+                  Перенос будет записан в историю просрочек
+                </span>
+              )}
             </div>
           </label>
           

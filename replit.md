@@ -113,6 +113,23 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-27**: Added installment end date auto-calculation and smart postponement handling
+  - ✅ **Auto-calculation of installment end date** in AddClientDialog:
+    - End date = Start date + (monthlyPayments - 1) months
+    - useEffect automatically recalculates when start date or payment count changes
+    - Manual override possible, calculator button for explicit recalculation
+    - Field marked with "(авто)" and purple background
+  - ✅ **"Это просрочка?" checkbox** in PostponePaymentDialog:
+    - Distinguishes planned postponements from overdue ones
+    - Planned transfers: only update payment date
+    - Overdue transfers: record in overdueHistory, set originalDate/postponeReason, mark status unreliable
+    - Helpful hints explain impact of each option
+  - ✅ **UX improvements** in PostponePaymentDialog:
+    - newDate pre-filled from current payment date
+    - Removed min constraint to allow viewing past dates
+    - Displays current payment date as reference
+  - ✅ Validated by architect - all criteria met, no regressions
+
 - **2025-11-27**: **DEFINITIVE FIX**: Replaced Radix UI Select with native HTML select for manager filter
   - ✅ **Root Cause**: Radix UI Select portal was invisible in Replit iframe environment
     - Portal rendered with opacity:0 due to CSS inheritance from parent containers

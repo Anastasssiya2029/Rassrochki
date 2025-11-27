@@ -46,6 +46,9 @@ export function PostponePaymentDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isOverdue && !reason.trim()) {
+      return;
+    }
     onPostpone(new Date(newDate), reason, isOverdue);
     onOpenChange(false);
     setReason('');
@@ -77,18 +80,19 @@ export function PostponePaymentDialog({
             </p>
           </div>
           
-          <div className="space-y-3">
-            <Label htmlFor="reason" className="text-gray-900">Причина переноса</Label>
-            <Textarea
-              id="reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Укажите причину переноса платежа"
-              required
-              rows={4}
-              className="rounded-2xl resize-none"
-            />
-          </div>
+          {isOverdue && (
+            <div className="space-y-3">
+              <Label htmlFor="reason" className="text-gray-900">Причина переноса</Label>
+              <Textarea
+                id="reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Укажите причину переноса платежа"
+                rows={4}
+                className="rounded-2xl resize-none"
+              />
+            </div>
+          )}
 
           <div className="flex items-center gap-3 p-4 rounded-2xl bg-orange-50/50 border border-orange-100">
             <Checkbox

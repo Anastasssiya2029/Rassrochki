@@ -146,18 +146,18 @@ export function PaymentCalendar({
   return (
     <>
       <div className="backdrop-blur-xl bg-white/80 rounded-3xl border border-purple-200/50 shadow-2xl shadow-purple-200/20 hover:shadow-purple-300/30 transition-all duration-500">
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-[#2D1B69] font-semibold">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-[#2D1B69] font-semibold text-sm sm:text-base">
               {getMonthName(currentMonth)}
             </h2>
-            <div className="flex gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
-                className="border-purple-200/50 bg-white/90 text-[#2D1B69] hover:bg-purple-100/30 hover:text-[#263238] transition-all duration-300 rounded-2xl"
+                className="border-purple-200/50 bg-white/90 text-[#2D1B69] hover:bg-purple-100/30 hover:text-[#263238] transition-all duration-300 rounded-2xl p-2 sm:p-3"
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
@@ -165,7 +165,7 @@ export function PaymentCalendar({
                 variant="outline"
                 size="sm"
                 onClick={() => handleMonthChange(new Date())}
-                className="border-purple-200/50 bg-white/90 text-[#2D1B69] hover:bg-purple-100/30 hover:text-[#263238] transition-all duration-300 rounded-2xl"
+                className="border-purple-200/50 bg-white/90 text-[#2D1B69] hover:bg-purple-100/30 hover:text-[#263238] transition-all duration-300 rounded-2xl hidden sm:flex"
               >
                 Месяц
               </Button>
@@ -173,7 +173,7 @@ export function PaymentCalendar({
                 variant="outline"
                 size="sm"
                 onClick={() => handleMonthChange(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
-                className="border-purple-200/50 bg-white/90 text-[#2D1B69] hover:bg-purple-100/30 hover:text-[#263238] transition-all duration-300 rounded-2xl"
+                className="border-purple-200/50 bg-white/90 text-[#2D1B69] hover:bg-purple-100/30 hover:text-[#263238] transition-all duration-300 rounded-2xl p-2 sm:p-3"
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
@@ -184,7 +184,7 @@ export function PaymentCalendar({
           <div className="grid grid-cols-7 gap-0">
             {/* Week Day Headers */}
             {weekDays.map(day => (
-              <div key={day} className="text-center py-2 text-[#263238]/70 font-semibold border-b-2 border-dashed border-purple-300/60">
+              <div key={day} className="text-center py-1 sm:py-2 text-[#263238]/70 font-semibold border-b-2 border-dashed border-purple-300/60 text-xs sm:text-sm">
                 {day}
               </div>
             ))}
@@ -207,31 +207,31 @@ export function PaymentCalendar({
                       <div
                         onClick={() => handleDayClick(day)}
                         className={`
-                          min-h-24 p-3 transition-all duration-300 cursor-pointer
+                          min-h-16 sm:min-h-24 p-1 sm:p-3 transition-all duration-300 cursor-pointer
                           border border-dashed border-purple-300/50
                           ${!isCurrentMonth ? 'bg-purple-50/30 opacity-40' : 'bg-white/50'}
                           ${isToday ? 'ring-2 ring-purple-600 bg-purple-100/30 shadow-lg shadow-purple-300/20 border-solid border-purple-400/50' : ''}
                           ${payments.length > 0 ? 'hover:shadow-xl hover:scale-[1.02] hover:ring-2 hover:ring-purple-300/50 hover:border-solid hover:border-purple-300/50 hover:z-10' : 'hover:bg-purple-50/50'}
                         `}
                       >
-                        <div className="flex justify-between items-start mb-1">
-                          <span className={`${isToday ? 'text-purple-600' : 'text-[#2D1B69]'}`}>
+                        <div className="flex justify-between items-start mb-0.5 sm:mb-1">
+                          <span className={`text-xs sm:text-sm ${isToday ? 'text-purple-600' : 'text-[#2D1B69]'}`}>
                             {day.getDate()}
                           </span>
                           {payments.length > 0 && (
-                            <div className="flex gap-1 items-center flex-wrap">
-                              {hasPostponedPayments && <span className="text-xs">🙏</span>}
+                            <div className="flex gap-0.5 sm:gap-1 items-center flex-wrap">
+                              {hasPostponedPayments && <span className="text-[10px] sm:text-xs">🙏</span>}
                               {hasPaidPayments && (
-                                <div className="w-2 h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
                               )}
                               {hasUnpaidPayments && (
-                                <div className="w-2 h-2 rounded-full bg-purple-600 shadow-sm shadow-purple-600/50" />
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-purple-600 shadow-sm shadow-purple-600/50" />
                               )}
                             </div>
                           )}
                         </div>
                         {payments.length > 0 && (
-                          <div className="mt-1 space-y-1">
+                          <div className="mt-0.5 sm:mt-1 space-y-0.5 sm:space-y-1">
                             {(() => {
                               const totalExpected = payments
                                 .reduce((sum, p) => sum + (p.payment.amount || 0), 0);
@@ -242,20 +242,20 @@ export function PaymentCalendar({
                               
                               return (
                                 <>
-                                  <div className="text-xs">
-                                    <p className="text-[#2D1B69] font-medium">
+                                  <div className="text-[10px] sm:text-xs">
+                                    <p className="text-[#2D1B69] font-medium truncate">
                                       {totalExpected.toLocaleString('ru-RU')} ₽
                                     </p>
-                                    <p className="text-[#263238]/70 text-xs">
-                                      Ожидается
+                                    <p className="text-[#263238]/70 text-[8px] sm:text-xs">
+                                      Ожид.
                                     </p>
                                   </div>
-                                  <div className="text-xs">
-                                    <p className="text-green-600 font-medium">
+                                  <div className="text-[10px] sm:text-xs">
+                                    <p className="text-green-600 font-medium truncate">
                                       {paidTotal.toLocaleString('ru-RU')} ₽
                                     </p>
-                                    <p className="text-green-600/70 text-xs">
-                                      Оплачено
+                                    <p className="text-green-600/70 text-[8px] sm:text-xs">
+                                      Опл.
                                     </p>
                                   </div>
                                 </>

@@ -81,17 +81,17 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-blue-200/50 rounded-3xl shadow-3d-cosmic">
+      <DialogContent className="max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto bg-white/95 backdrop-blur-xl border-blue-200/50 rounded-3xl shadow-3d-cosmic">
         <DialogHeader>
-          <DialogTitle className="text-gradient">Редактировать клиента</DialogTitle>
-          <DialogDescription className="text-[#263238]/70">
+          <DialogTitle className="text-gradient text-lg sm:text-xl">Редактировать клиента</DialogTitle>
+          <DialogDescription className="text-[#263238]/70 text-sm sm:text-base">
             Измените информацию о клиенте
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
-          <div className="grid grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 mt-4 sm:mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-gray-900">Имя клиента</Label>
+              <Label htmlFor="name" className="text-gray-900 text-sm sm:text-base">Имя клиента</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -101,7 +101,7 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-gray-900">Username</Label>
+              <Label htmlFor="username" className="text-gray-900 text-sm sm:text-base">Username</Label>
               <Input
                 id="username"
                 value={formData.username}
@@ -113,9 +113,9 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
-              <Label htmlFor="tariff" className="text-gray-900">Тариф</Label>
+              <Label htmlFor="tariff" className="text-gray-900 text-sm sm:text-base">Тариф</Label>
               <Input
                 id="tariff"
                 value={formData.tariff}
@@ -125,7 +125,7 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="manager" className="text-gray-900">Менеджер</Label>
+              <Label htmlFor="manager" className="text-gray-900 text-sm sm:text-base">Менеджер</Label>
               <Input
                 id="manager"
                 value={formData.manager}
@@ -136,12 +136,13 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div className="space-y-2">
-              <Label htmlFor="totalAmount" className="text-gray-900">Общая сумма (₽)</Label>
+              <Label htmlFor="totalAmount" className="text-gray-900 text-sm sm:text-base">Общая сумма (₽)</Label>
               <Input
                 id="totalAmount"
                 type="number"
+                inputMode="numeric"
                 value={formData.totalAmount}
                 onChange={(e) => setFormData({ ...formData, totalAmount: e.target.value })}
                 required
@@ -149,10 +150,11 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="prepayment" className="text-gray-900">Предоплата (₽)</Label>
+              <Label htmlFor="prepayment" className="text-gray-900 text-sm sm:text-base">Предоплата (₽)</Label>
               <Input
                 id="prepayment"
                 type="number"
+                inputMode="numeric"
                 value={formData.prepayment}
                 onChange={(e) => setFormData({ ...formData, prepayment: e.target.value })}
                 required
@@ -161,9 +163,9 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div className="space-y-2">
-              <Label htmlFor="prepaymentDate" className="text-gray-900">Дата предоплаты</Label>
+              <Label htmlFor="prepaymentDate" className="text-gray-900 text-sm sm:text-base">Дата предоплаты</Label>
               <Input
                 id="prepaymentDate"
                 type="date"
@@ -174,7 +176,7 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="installmentStart" className="text-gray-900">Начало рассрочки</Label>
+              <Label htmlFor="installmentStart" className="text-gray-900 text-sm sm:text-base">Начало рассрочки</Label>
               <Input
                 id="installmentStart"
                 type="date"
@@ -185,7 +187,7 @@ export function EditClientDialog({ open, onOpenChange, onEditClient, client }: E
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="installmentEnd" className="text-gray-900">Конец рассрочки</Label>
+              <Label htmlFor="installmentEnd" className="text-gray-900 text-sm sm:text-base">Конец рассрочки</Label>
               <Input
                 id="installmentEnd"
                 type="date"

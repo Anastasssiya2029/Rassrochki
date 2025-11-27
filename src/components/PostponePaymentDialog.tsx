@@ -10,7 +10,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { Checkbox } from './ui/checkbox';
+import { Check } from 'lucide-react';
 
 interface PostponePaymentDialogProps {
   open: boolean;
@@ -46,10 +46,13 @@ export function PostponePaymentDialog({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (isOverdue && !reason.trim()) {
       return;
     }
-    onPostpone(new Date(newDate), reason, isOverdue);
+    
+    const parsedDate = new Date(newDate + 'T00:00:00');
+    onPostpone(parsedDate, reason, isOverdue);
     onOpenChange(false);
     setReason('');
     setIsOverdue(true);
@@ -94,17 +97,25 @@ export function PostponePaymentDialog({
             </div>
           )}
 
-          <div className="flex items-center gap-3 p-4 rounded-2xl bg-orange-50/50 border border-orange-100">
-            <Checkbox
-              id="isOverdue"
-              checked={isOverdue}
-              onCheckedChange={(checked) => setIsOverdue(checked === true)}
-              className="border-orange-300 data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
-            />
+          <div 
+            className={`flex items-center gap-3 p-4 rounded-2xl cursor-pointer transition-all duration-200 ${
+              isOverdue 
+                ? 'bg-orange-100 border-2 border-orange-400' 
+                : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+            }`}
+            onClick={() => setIsOverdue(!isOverdue)}
+          >
+            <div className={`w-6 h-6 rounded-md flex items-center justify-center transition-all duration-200 ${
+              isOverdue 
+                ? 'bg-orange-500 border-2 border-orange-600' 
+                : 'bg-white border-2 border-gray-300'
+            }`}>
+              {isOverdue && <Check className="w-4 h-4 text-white" strokeWidth={3} />}
+            </div>
             <div className="flex flex-col gap-0.5">
-              <Label htmlFor="isOverdue" className="text-gray-900 cursor-pointer font-medium">
+              <span className="text-gray-900 font-medium">
                 Это просрочка
-              </Label>
+              </span>
               <span className="text-xs text-gray-500">
                 {isOverdue 
                   ? "Перенос будет записан в историю просрочек" 

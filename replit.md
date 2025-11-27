@@ -113,6 +113,16 @@ See `src/backend-example/README.md` for API documentation.
 - PostgreSQL (backend)
 
 ## Recent Changes
+- **2025-11-27**: **DEFINITIVE FIX**: Replaced Radix UI Select with native HTML select for manager filter
+  - ✅ **Root Cause**: Radix UI Select portal was invisible in Replit iframe environment
+    - Portal rendered with opacity:0 due to CSS inheritance from parent containers
+    - All previous fixes (forwardRef, inline styles, z-index, modal={true}) failed
+  - ✅ **Solution**: Replaced Radix UI Select with native HTML `<select>` element
+    - Native select works reliably in all browser/iframe environments
+    - Styled with rounded corners, focus states, hover effects to match design
+    - Removed unused Radix Select imports from Dashboard.tsx
+  - ✅ Validated by architect - no regressions, filtering logic preserved
+
 - **2025-11-26**: **CRITICAL FIX**: Fixed Select dropdown visibility issue (dropdown opened but was invisible)
   - ✅ **Root Cause**: CSS custom properties (`--popover`, `--popover-foreground`, `--accent`) were undefined in project
     - `bg-popover` rendered as transparent background → dropdown invisible

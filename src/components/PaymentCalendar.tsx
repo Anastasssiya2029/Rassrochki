@@ -236,7 +236,7 @@ export function PaymentCalendar({
                           )}
                         </div>
                         {payments.length > 0 && (
-                          <div className="mt-0.5 sm:mt-1 space-y-0.5 sm:space-y-1">
+                          <div className="mt-0.5 sm:mt-1 space-y-0 sm:space-y-1">
                             {(() => {
                               const totalExpected = payments
                                 .reduce((sum, p) => sum + (p.payment.amount || 0), 0);
@@ -247,24 +247,20 @@ export function PaymentCalendar({
                               
                               return (
                                 <>
-                                  <div className="text-[10px] sm:text-xs">
-                                    <p className="text-[#2D1B69] font-medium truncate">
-                                      <span className="sm:hidden">{formatAmountShort(totalExpected)}</span>
-                                      <span className="hidden sm:inline">{totalExpected.toLocaleString('ru-RU')} ₽</span>
-                                    </p>
-                                    <p className="text-[#263238]/70 text-[8px] sm:text-xs hidden sm:block">
-                                      Ожидается
-                                    </p>
-                                  </div>
-                                  <div className="text-[10px] sm:text-xs">
-                                    <p className="text-green-600 font-medium truncate">
-                                      <span className="sm:hidden">{formatAmountShort(paidTotal)}</span>
-                                      <span className="hidden sm:inline">{paidTotal.toLocaleString('ru-RU')} ₽</span>
-                                    </p>
-                                    <p className="text-green-600/70 text-[8px] sm:text-xs hidden sm:block">
-                                      Оплачено
-                                    </p>
-                                  </div>
+                                  <p className="text-[#2D1B69] font-medium truncate text-[8px] sm:text-xs leading-tight">
+                                    <span className="sm:hidden">{formatAmountShort(totalExpected)}</span>
+                                    <span className="hidden sm:inline">{totalExpected.toLocaleString('ru-RU')} ₽</span>
+                                  </p>
+                                  <p className="text-[#263238]/70 text-[7px] sm:text-xs hidden sm:block">
+                                    Ожидается
+                                  </p>
+                                  <p className="text-green-600 font-medium truncate text-[8px] sm:text-xs leading-tight">
+                                    <span className="sm:hidden">{formatAmountShort(paidTotal)}</span>
+                                    <span className="hidden sm:inline">{paidTotal.toLocaleString('ru-RU')} ₽</span>
+                                  </p>
+                                  <p className="text-green-600/70 text-[7px] sm:text-xs hidden sm:block">
+                                    Оплачено
+                                  </p>
                                 </>
                               );
                             })()}

@@ -131,21 +131,29 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
                     </p>
                     {month.count > 0 && (
                       <>
-                        <p className="text-gray-500 text-xs">
+                        <p className="text-gray-500 text-[10px] sm:text-xs">
                           {month.count} шт
                         </p>
-                        <div className="bg-gray-50 rounded-lg p-1.5 sm:p-2 space-y-0.5">
-                          <p className="text-gray-900 text-xs flex items-center gap-1.5 justify-center">
-                            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-purple-200 flex-shrink-0" />
-                            <span className="min-w-[24px] sm:min-w-[28px]">{(month.totalAmount / 1000).toFixed(0)}k</span>
+                        <div className="bg-gray-50 rounded-lg p-1 sm:p-2 space-y-0.5">
+                          {/* На мобильном - только суммы без точек */}
+                          <p className="text-purple-400 text-[10px] sm:text-xs sm:hidden">
+                            {(month.totalAmount / 1000).toFixed(0)}k
                           </p>
-                          <p className="text-[#263238] text-xs flex items-center gap-1.5 justify-center">
-                            <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-purple-500 flex-shrink-0" />
-                            <span className="min-w-[24px] sm:min-w-[28px]">{(month.paidAmount / 1000).toFixed(0)}k</span>
+                          <p className="text-purple-600 text-[10px] sm:text-xs font-medium sm:hidden">
+                            {(month.paidAmount / 1000).toFixed(0)}k
+                          </p>
+                          {/* На десктопе - с точками */}
+                          <p className="text-gray-900 text-xs hidden sm:flex items-center gap-1.5 justify-center">
+                            <span className="w-2.5 h-2.5 rounded-full bg-purple-200 flex-shrink-0" />
+                            <span className="min-w-[28px]">{(month.totalAmount / 1000).toFixed(0)}k</span>
+                          </p>
+                          <p className="text-[#263238] text-xs hidden sm:flex items-center gap-1.5 justify-center">
+                            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 flex-shrink-0" />
+                            <span className="min-w-[28px]">{(month.paidAmount / 1000).toFixed(0)}k</span>
                           </p>
                           {/* Процент оплаты */}
                           <div className="pt-1 border-t border-gray-200/50">
-                            <p className={`text-xs font-semibold ${
+                            <p className={`text-[10px] sm:text-xs font-semibold ${
                               month.totalAmount > 0 
                                 ? (month.paidAmount / month.totalAmount * 100) >= 100 
                                   ? 'text-green-600' 
@@ -161,7 +169,7 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
                           </div>
                         </div>
                         {isPastMonth && month.percentage < 100 && (
-                          <p className="text-red-500 text-xs mt-1">
+                          <p className="text-red-500 text-[10px] sm:text-xs mt-1">
                             {month.percentage}%
                           </p>
                         )}

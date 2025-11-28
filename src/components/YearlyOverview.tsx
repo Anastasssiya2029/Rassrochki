@@ -85,65 +85,66 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
           </div>
         </div>
         
-        {/* Mobile: 6 months only */}
-        <div className="grid grid-cols-6 gap-2 sm:hidden">
-          {monthsData.slice(0, 6).map((month, index) => {
-            const heightPercentage = (month.totalAmount / maxAmount) * 100;
-            const paidHeightPercentage = (month.paidAmount / maxAmount) * 100;
-            const expectedHeightPercentage = heightPercentage - paidHeightPercentage;
-            const isPastMonth = month.date < new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-            
-            return (
-              <div key={index} className="flex flex-col items-center">
-                <div 
-                  className="w-full h-28 flex flex-col justify-end mb-2 relative group cursor-pointer"
-                  onClick={() => onMonthClick(month.date)}
-                >
-                  {month.totalAmount > 0 ? (
-                    <div 
-                      className="w-full flex flex-col rounded-t-xl overflow-hidden transition-all duration-500 hover:shadow-xl shadow-lg"
-                      style={{ height: `${heightPercentage}%` }}
-                    >
-                      {expectedHeightPercentage > 0 && (
-                        <div 
-                          className="w-full bg-gradient-to-b from-purple-200/50 to-purple-100/50"
-                          style={{ height: `${(expectedHeightPercentage / heightPercentage) * 100}%` }}
-                        />
-                      )}
-                      {paidHeightPercentage > 0 && (
-                        <div 
-                          className="w-full bg-gradient-to-t from-blue-500 via-purple-500 to-purple-400"
-                          style={{ height: `${(paidHeightPercentage / heightPercentage) * 100}%` }}
-                        />
-                      )}
-                    </div>
-                  ) : (
-                    <div className="w-full h-4 bg-gray-100 rounded-xl opacity-50" />
-                  )}
+        {/* Mobile: 6 months with horizontal scroll */}
+        <div className="overflow-x-auto -mx-4 px-4 pb-2 sm:hidden">
+          <div className="flex gap-3" style={{ minWidth: '500px' }}>
+            {monthsData.slice(0, 6).map((month, index) => {
+              const heightPercentage = (month.totalAmount / maxAmount) * 100;
+              const paidHeightPercentage = (month.paidAmount / maxAmount) * 100;
+              const expectedHeightPercentage = heightPercentage - paidHeightPercentage;
+              
+              return (
+                <div key={index} className="flex-1 flex flex-col items-center min-w-[70px]">
+                  <div 
+                    className="w-full h-24 flex flex-col justify-end mb-2 cursor-pointer"
+                    onClick={() => onMonthClick(month.date)}
+                  >
+                    {month.totalAmount > 0 ? (
+                      <div 
+                        className="w-full flex flex-col rounded-t-xl overflow-hidden shadow-md"
+                        style={{ height: `${heightPercentage}%` }}
+                      >
+                        {expectedHeightPercentage > 0 && (
+                          <div 
+                            className="w-full bg-gradient-to-b from-purple-200/50 to-purple-100/50"
+                            style={{ height: `${(expectedHeightPercentage / heightPercentage) * 100}%` }}
+                          />
+                        )}
+                        {paidHeightPercentage > 0 && (
+                          <div 
+                            className="w-full bg-gradient-to-t from-blue-500 via-purple-500 to-purple-400"
+                            style={{ height: `${(paidHeightPercentage / heightPercentage) * 100}%` }}
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <div className="w-full h-4 bg-gray-100 rounded-xl opacity-50" />
+                    )}
+                  </div>
+                  <div className="text-center w-full">
+                    <p className="text-gray-900 text-[11px] font-medium">{getMonthName(month.date)}</p>
+                    {month.count > 0 && (
+                      <div className="bg-gray-50 rounded-lg p-1.5 mt-1">
+                        <p className="text-purple-400 text-[10px]">{(month.totalAmount / 1000).toFixed(0)}k</p>
+                        <p className="text-purple-600 text-[10px] font-medium">{(month.paidAmount / 1000).toFixed(0)}k</p>
+                        <p className={`text-[10px] font-semibold ${
+                          month.totalAmount > 0 
+                            ? (month.paidAmount / month.totalAmount * 100) >= 100 
+                              ? 'text-green-600' 
+                              : (month.paidAmount / month.totalAmount * 100) >= 50
+                                ? 'text-[#2D1B69]'
+                                : 'text-orange-500'
+                            : 'text-gray-400'
+                        }`}>
+                          {month.totalAmount > 0 ? `${Math.round((month.paidAmount / month.totalAmount) * 100)}%` : '0%'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="text-center w-full">
-                  <p className="text-gray-900 text-[10px]">{getMonthName(month.date)}</p>
-                  {month.count > 0 && (
-                    <div className="bg-gray-50 rounded-lg p-1 mt-1 space-y-0">
-                      <p className="text-purple-400 text-[9px]">{(month.totalAmount / 1000).toFixed(0)}k</p>
-                      <p className="text-purple-600 text-[9px] font-medium">{(month.paidAmount / 1000).toFixed(0)}k</p>
-                      <p className={`text-[9px] font-semibold ${
-                        month.totalAmount > 0 
-                          ? (month.paidAmount / month.totalAmount * 100) >= 100 
-                            ? 'text-green-600' 
-                            : (month.paidAmount / month.totalAmount * 100) >= 50
-                              ? 'text-[#2D1B69]'
-                              : 'text-orange-500'
-                          : 'text-gray-400'
-                      }`}>
-                        {month.totalAmount > 0 ? `${Math.round((month.paidAmount / month.totalAmount) * 100)}%` : '0%'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Desktop: 12 months */}

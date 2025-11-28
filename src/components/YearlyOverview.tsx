@@ -69,7 +69,10 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
     <div className="bg-white rounded-3xl shadow-3d hover:shadow-3d-hover transition-all duration-500">
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h2 className="text-[#2D1B69] font-semibold text-xl sm:text-xl lg:text-2xl">Обзор платежей на год</h2>
+          <h2 className="text-[#2D1B69] font-semibold text-xl sm:text-xl lg:text-2xl">
+            <span className="sm:hidden">Обзор платежей на пол года</span>
+            <span className="hidden sm:inline">Обзор платежей на год</span>
+          </h2>
           <div className="flex items-center gap-4 sm:gap-6 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg shadow-sm" />
@@ -82,10 +85,70 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
           </div>
         </div>
         
-        {/* Horizontal scroll wrapper for mobile */}
-        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
-          <div className="grid grid-cols-12 gap-2 sm:gap-3 min-w-[700px] sm:min-w-0">
-            {monthsData.map((month, index) => {
+        {/* Mobile: 6 months only */}
+        <div className="grid grid-cols-6 gap-2 sm:hidden">
+          {monthsData.slice(0, 6).map((month, index) => {
+            const heightPercentage = (month.totalAmount / maxAmount) * 100;
+            const paidHeightPercentage = (month.paidAmount / maxAmount) * 100;
+            const expectedHeightPercentage = heightPercentage - paidHeightPercentage;
+            const isPastMonth = month.date < new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+            
+            return (
+              <div key={index} className="flex flex-col items-center">
+                <div 
+                  className="w-full h-28 flex flex-col justify-end mb-2 relative group cursor-pointer"
+                  onClick={() => onMonthClick(month.date)}
+                >
+                  {month.totalAmount > 0 ? (
+                    <div 
+                      className="w-full flex flex-col rounded-t-xl overflow-hidden transition-all duration-500 hover:shadow-xl shadow-lg"
+                      style={{ height: `${heightPercentage}%` }}
+                    >
+                      {expectedHeightPercentage > 0 && (
+                        <div 
+                          className="w-full bg-gradient-to-b from-purple-200/50 to-purple-100/50"
+                          style={{ height: `${(expectedHeightPercentage / heightPercentage) * 100}%` }}
+                        />
+                      )}
+                      {paidHeightPercentage > 0 && (
+                        <div 
+                          className="w-full bg-gradient-to-t from-blue-500 via-purple-500 to-purple-400"
+                          style={{ height: `${(paidHeightPercentage / heightPercentage) * 100}%` }}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="w-full h-4 bg-gray-100 rounded-xl opacity-50" />
+                  )}
+                </div>
+                <div className="text-center w-full">
+                  <p className="text-gray-900 text-[10px]">{getMonthName(month.date)}</p>
+                  {month.count > 0 && (
+                    <div className="bg-gray-50 rounded-lg p-1 mt-1 space-y-0">
+                      <p className="text-purple-400 text-[9px]">{(month.totalAmount / 1000).toFixed(0)}k</p>
+                      <p className="text-purple-600 text-[9px] font-medium">{(month.paidAmount / 1000).toFixed(0)}k</p>
+                      <p className={`text-[9px] font-semibold ${
+                        month.totalAmount > 0 
+                          ? (month.paidAmount / month.totalAmount * 100) >= 100 
+                            ? 'text-green-600' 
+                            : (month.paidAmount / month.totalAmount * 100) >= 50
+                              ? 'text-[#2D1B69]'
+                              : 'text-orange-500'
+                          : 'text-gray-400'
+                      }`}>
+                        {month.totalAmount > 0 ? `${Math.round((month.paidAmount / month.totalAmount) * 100)}%` : '0%'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: 12 months */}
+        <div className="hidden sm:grid grid-cols-12 gap-3">
+          {monthsData.map((month, index) => {
               const heightPercentage = (month.totalAmount / maxAmount) * 100;
               const paidHeightPercentage = (month.paidAmount / maxAmount) * 100;
               const expectedHeightPercentage = heightPercentage - paidHeightPercentage;
@@ -179,7 +242,6 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
                 </div>
               );
             })}
-          </div>
         </div>
       </div>
     </div>

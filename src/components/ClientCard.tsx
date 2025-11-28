@@ -100,14 +100,9 @@ export function ClientCard({ client, onTogglePayment, onPostponePayment, onEditC
                 {/* Задача #1 - Увеличенные размеры шрифтов */}
                 <h3 className="text-base sm:text-lg lg:text-xl text-gray-900 truncate">{client.name}</h3>
                 {/* Задача #10, #24 - Иконка + эмодзи для статуса */}
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <span className="text-lg sm:text-xl" role="img" aria-label={client.status === 'reliable' ? 'Надежный клиент' : 'Ненадежный клиент'}>
-                    {client.status === 'reliable' ? '💗' : '💔'}
-                  </span>
-                  <span className={`text-xs sm:hidden ${client.status === 'reliable' ? 'text-green-600' : 'text-red-500'}`}>
-                    {client.status === 'reliable' ? 'Надежный клиент' : 'Ненадежный клиент'}
-                  </span>
-                </div>
+                <span className="text-lg sm:text-xl flex-shrink-0" role="img" aria-label={client.status === 'reliable' ? 'Надежный клиент' : 'Ненадежный клиент'}>
+                  {client.status === 'reliable' ? '💗' : '💔'}
+                </span>
               </div>
               <p className="text-sm sm:text-base text-gray-600 mb-1">{client.username}</p>
               <p className="text-[#2D1B69] font-semibold">«{client.tariff}» за {client.totalAmount.toLocaleString('ru-RU')} руб.</p>

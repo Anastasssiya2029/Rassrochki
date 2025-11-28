@@ -3,6 +3,7 @@ import { ClientList } from './ClientList';
 import { PaymentCalendar } from './PaymentCalendar';
 import { MonthlyOverview } from './MonthlyOverview';
 import { YearlyOverview } from './YearlyOverview';
+import { PastYearlyOverview } from './PastYearlyOverview';
 import { StatusLegend } from './StatusLegend';
 import { AddClientDialog } from './AddClientDialog';
 import { EditClientDialog } from './EditClientDialog';
@@ -663,6 +664,7 @@ export function Dashboard() {
               onClientClick={setEditingClient}
             />
             <YearlyOverview clients={displayedClients} onMonthClick={handleMonthClick} />
+            <PastYearlyOverview clients={displayedClients} onMonthClick={handleMonthClick} />
           </div>
         ) : (
           <UserManagement

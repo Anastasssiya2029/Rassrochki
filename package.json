@@ -29,6 +29,7 @@
             "@radix-ui/react-toggle": "*",
             "@radix-ui/react-toggle-group": "*",
             "@radix-ui/react-tooltip": "*",
+            "@tailwindcss/vite": "^4.1.17",
             "class-variance-authority": "*",
             "clsx": "*",
             "cmdk": "*",
@@ -46,6 +47,7 @@
             "recharts": "^2.15.2",
             "sonner": "^2.0.3",
             "tailwind-merge": "*",
+            "tailwindcss": "^4.1.17",
             "vaul": "^1.1.2"
       },
       "devDependencies": {

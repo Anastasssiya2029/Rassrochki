@@ -1,255 +1,40 @@
 # Interactive Payment Tracking Service
 
 ## Overview
-This is a payment tracking and installment management system for online schools. The application helps track client payments, manage installment schedules, and handle overdue payments.
+This project is an interactive payment tracking and installment management service designed for online schools. Its primary purpose is to help educational institutions monitor client payments, manage installment schedules, and effectively handle overdue payments. The system aims to streamline financial operations, improve client relationship management, and provide clear visibility into payment statuses.
 
-**Original Project**: [Figma Design](https://www.figma.com/design/2Hz5vxVZwXljYhAQShe4ID/Interactive-Payment-Tracking-Service)
+## User Preferences
+I prefer iterative development with clear, concise explanations. Please ask before making major architectural changes or introducing new external dependencies. Focus on delivering robust, production-ready code.
 
-## Project Structure
-- **Frontend**: React + Vite + TypeScript
-  - Modern UI with shadcn/ui components
-  - Responsive design with cosmic gradient theme
-  - Calendar view for payment tracking
-  - Client management dashboard
-- **Backend** (optional): Node.js + Express + PostgreSQL
-  - Located in `src/backend-example/`
-  - JWT authentication
-  - PostgreSQL database for schools, users, clients, and payments
+## System Architecture
+The application features a modern, responsive UI built with React, Vite, and TypeScript, utilizing `shadcn/ui` components and a cosmic gradient theme. Key UI/UX decisions include a calendar view for payment tracking and a client management dashboard.
 
-## Current Setup
-The application is running with **full backend integration**:
-- PostgreSQL database (External server: 194.87.215.84)
-  - Database: `data_vrassrochki`
-  - Schema: `payment_tracking` (isolated from other projects)
-- Node.js/Express backend API (port 3001)
-- Real-time data persistence
-- JWT authentication
-- Full production-ready stack
+The system is a full-stack application with a Node.js/Express backend and a PostgreSQL database.
+**Technical Implementations and System Design:**
+- **Frontend**: React + Vite + TypeScript, Tailwind CSS, Radix UI, Recharts, React Hook Form.
+- **Backend**: Node.js + Express, PostgreSQL.
+- **Authentication**: JWT-based authentication system.
+- **Database Schema**: Dedicated `payment_tracking` schema with tables for `schools`, `users`, `clients`, `payments`, and `overdue_history`.
+- **Multi-Role Support**: Designed to support multiple user roles (Architect, Admin, Manager, Assistant) per email address across different schools. The `email` field does not have a `UNIQUE` constraint to facilitate this. Each user record is unique by (`email` + `role` + `school_id`).
+- **Schema Resolution**: Utilizes PostgreSQL `search_path` for automatic schema resolution, setting `search_path = payment_tracking, public` on connection to allow unqualified table names in queries.
+- **API Proxying**: Frontend (port 5000) proxies API requests through Vite to the Backend (port 3001).
+- **Core Features**:
+    - User Authentication (Login/Registration)
+    - Client Management (CRUD operations)
+    - Payment Calendar (visual overview, status tracking)
+    - Payment Statuses (Paid, Upcoming, Overdue)
+    - Payment Postponement/Rescheduling
+    - Multi-school Management (for Architect role)
+    - Role-based Access Control
 
-## Running the Application
-
-### Starting the App
-The application runs automatically via the **Frontend** workflow. To start or restart:
-1. Click the **Run** button in the top toolbar, or
-2. Use the command: `npm run dev`
-
-The app will start on **port 5000** and appear in the Webview panel.
-
-### Current Configuration
-**Frontend:**
-- **Workflow**: Frontend (runs `npm run dev`)
-- **Port**: 5000 (automatically exposed by Replit)
-- **Host**: 0.0.0.0 (configured for Replit proxy)
-- **URL**: Available in the Webview panel
-
-**Backend:**
-- **Workflow**: Backend (runs `cd src/backend-example && node server.js`)
-- **Port**: 3001 (internal, accessed via Vite proxy)
-- **Database**: PostgreSQL (External server)
-  - Host: 194.87.215.84:5432
-  - Database: data_vrassrochki
-  - Schema: payment_tracking (isolated)
-- **API Endpoint**: `/api` (proxied from frontend)
-
-### Stopping/Restarting
-- Use the workflow controls in the Replit interface
-- Or manually stop with Ctrl+C in the console and restart with `npm run dev`
-
-## Features
-- **User Authentication**: Login and registration system
-- **Client Management**: Add, edit, and track clients
-- **Payment Calendar**: Visual monthly/yearly payment overview
-- **Payment Status Tracking**: Paid, upcoming, overdue statuses
-- **Payment Postponement**: Reschedule overdue payments
-- **School Management**: Multi-school support (Architect role)
-- **User Roles**: Architect, Admin, Manager, Assistant
-
-## Backend & Database
-
-The backend is **already configured** and running:
-
-### Database Schema
-- `schools` - School organizations
-- `users` - User accounts (Architect, Admin, Manager, Assistant roles)
-- `clients` - Client records with payment plans
-- `payments` - Individual payment records
-- `overdue_history` - Payment postponement history
-
-### Current User Account
-**Email:** sochneva.anastasiya@gmail.com  
-**Role:** Architect (full system access)  
-**Password:** qwertyasd
-
-### Multi-Role Support
-The system supports **multiple roles per email address**:
-- One email can be an architect AND admin of different schools
-- Admins can be managers in other organizations
-- No UNIQUE constraint on email field (removed for multi-role support)
-- Each user record is unique by (email + role + school_id) combination
-
-### How It Works
-- Frontend (port 5000) → Vite proxy → Backend (port 3001) → External PostgreSQL
-- Authentication via JWT tokens
-- All API requests go through `/api` endpoint
-- Database connection using external PostgreSQL server
-- All data stored in dedicated `payment_tracking` schema for project isolation
-- **Schema Resolution**: Uses PostgreSQL `search_path` approach for automatic schema resolution
-  - Connection sets `search_path = payment_tracking, public` on connect
-  - All queries use unqualified table names (e.g., `SELECT * FROM users`)
-  - pg-format.ident() used for safe schema name escaping where needed
-
-See `src/backend-example/README.md` for API documentation.
-
-## Technologies Used
-- React 18
-- Vite 6
-- TypeScript
-- Tailwind CSS
-- Radix UI components
-- shadcn/ui
-- Recharts for analytics
-- React Hook Form
-- Express.js (backend)
-- PostgreSQL (backend)
-
-## Recent Changes
-- **2025-11-27**: Added installment end date auto-calculation and smart postponement handling
-  - ✅ **Auto-calculation of installment end date** in AddClientDialog:
-    - End date = Start date + (monthlyPayments - 1) months
-    - useEffect automatically recalculates when start date or payment count changes
-    - Manual override possible, calculator button for explicit recalculation
-    - Field marked with "(авто)" and purple background
-  - ✅ **"Это просрочка?" checkbox** in PostponePaymentDialog:
-    - Distinguishes planned postponements from overdue ones
-    - Planned transfers: only update payment date
-    - Overdue transfers: record in overdueHistory, set originalDate/postponeReason, mark status unreliable
-    - Helpful hints explain impact of each option
-  - ✅ **UX improvements** in PostponePaymentDialog:
-    - newDate pre-filled from current payment date
-    - Removed min constraint to allow viewing past dates
-    - Displays current payment date as reference
-  - ✅ Validated by architect - all criteria met, no regressions
-
-- **2025-11-27**: **DEFINITIVE FIX**: Replaced Radix UI Select with native HTML select for manager filter
-  - ✅ **Root Cause**: Radix UI Select portal was invisible in Replit iframe environment
-    - Portal rendered with opacity:0 due to CSS inheritance from parent containers
-    - All previous fixes (forwardRef, inline styles, z-index, modal={true}) failed
-  - ✅ **Solution**: Replaced Radix UI Select with native HTML `<select>` element
-    - Native select works reliably in all browser/iframe environments
-    - Styled with rounded corners, focus states, hover effects to match design
-    - Removed unused Radix Select imports from Dashboard.tsx
-  - ✅ Validated by architect - no regressions, filtering logic preserved
-
-- **2025-11-26**: **CRITICAL FIX**: Fixed Select dropdown visibility issue (dropdown opened but was invisible)
-  - ✅ **Root Cause**: CSS custom properties (`--popover`, `--popover-foreground`, `--accent`) were undefined in project
-    - `bg-popover` rendered as transparent background → dropdown invisible
-    - `text-popover-foreground` rendered as invisible text → items not visible
-    - Viewport height constraint `h-[var(--radix-select-trigger-height)]` restricted dropdown height
-  - ✅ **Solution**: Replaced undefined CSS variables with explicit Tailwind classes in select.tsx:
-    - SelectContent: `bg-white text-gray-900 border-gray-200` + `max-h-96`
-    - SelectItem: `focus:bg-purple-100 focus:text-gray-900 hover:bg-gray-100 text-gray-700`
-    - Added `cursor-pointer` for better UX
-  - ✅ **Dashboard improvements**:
-    - Manager filter now hidden on "Пользователи" (Users) tab - only visible on Клиенты and Календарь tabs
-    - Removed all debug console.log statements
-  - ✅ Validated by architect - dropdown now visible with proper styling
-
-- **2025-11-20**: **CRITICAL FIX**: Fixed Radix UI Select components not working (dropdowns not opening)
-  - ✅ **Root Cause**: All Select components were plain functions WITHOUT React.forwardRef
-    - Radix UI Select REQUIRES refs to be forwarded to DOM elements
-    - Without forwardRef, refs resolve to null → Radix can't attach event listeners → dropdowns never open
-    - This is why previous CSS/styling fixes didn't work - the problem was at React ref level
-  - ✅ **Solution**: Complete rewrite of src/components/ui/select.tsx
-    - Converted ALL components to use React.forwardRef pattern (SelectTrigger, SelectContent, SelectItem, etc.)
-    - Added displayName for React DevTools compatibility
-    - Maintained all custom styling (data-slot, TailwindCSS, z-index, animations)
-    - Reordered SelectScrollUpButton/SelectScrollDownButton before SelectContent (they're used inside it)
-  - ✅ **Impact**: Fixes ALL Select dropdowns in the app
-    - Manager filter in Dashboard (PRIMARY FIX)
-    - Manager dropdown in AddClientDialog
-    - Any future Select components
-  - ✅ Validated by architect - refs properly forwarded, no styling regressions
-  - ✅ **Lesson**: Radix UI primitives MUST use forwardRef - plain function wrappers break functionality
-
-- **2025-11-20**: Fixed SchoolSelector import errors
-  - ✅ Fixed incorrect sonner import: `sonner@2.0.3` → `sonner`
-  - ✅ Added missing React import for JSX compilation
-  - ✅ Resolved all LSP diagnostics (39 errors fixed)
-  - ✅ SchoolSelector now compiles without errors
-
-- **2025-11-20**: Fixed calendar "Ожидается" sum calculation logic
-  - ✅ "Ожидается" now shows total sum of ALL payments on a day (fixed amount)
-  - ✅ Previously showed only unpaid payments (decreased when marking as paid)
-  - ✅ Changed from `unpaidTotal` to `totalExpected` calculation
-  - ✅ "Оплачено" remains unchanged (sum of paid payments only)
-  - ✅ Business logic: Expected = fixed total, Paid = grows as payments are marked paid
-
-- **2025-11-19**: Added client click navigation in calendar day details
-  - ✅ Implemented clickable client names in DayDetailsDialog
-  - ✅ Client name shows hover effect (underline + purple color)
-  - ✅ Clicking client name opens EditClientDialog
-  - ✅ Props threaded through: Dashboard → PaymentCalendar → DayDetailsDialog
-  - ✅ Optional onClientClick prop maintains backward compatibility
-
-- **2025-11-19**: Fixed manager dropdown not opening in AddClientDialog
-  - ✅ Root cause #1: Radix UI Select doesn't work when value is empty string '' but no SelectItem has that value
-    - Changed formData.manager initialization from '' to undefined
-    - Updated Select value prop to use undefined when no manager selected
-    - Added explicit TypeScript types to formData state (manager: string | undefined)
-  - ✅ Root cause #2: z-index conflict between Dialog (z-[9999]) and SelectContent (z-50)
-    - SelectContent was rendering behind Dialog modal, making dropdown invisible
-    - Increased SelectContent z-index from z-50 to z-[10000] in ui/select.tsx
-    - Dropdown now appears correctly above modal dialogs
-  - ✅ Maintained backward compatibility with Input fallback when no managers exist
-
-- **2025-11-19**: Simplified calendar display - removed prepayments, show only aggregated sums
-  - ✅ Calendar cells now show only 2 aggregated sums per day (always visible):
-    - "Ожидается" - sum of all unpaid payments (default color)
-    - "Оплачено" - sum of all paid payments (green)
-  - ✅ Removed all prepayment-specific UI elements:
-    - No 🌸 flower emoji in calendar cells or tooltip
-    - No blue color for prepayments
-    - No "Предоплата" text in tooltip or legend
-  - ✅ Tooltip shows only: client name, amount, and status (Оплачено/Ожидается)
-  - ✅ Legend simplified: Оплачено, Ожидается, Перенесен, Сегодня
-  - ✅ Both sums always displayed, even when 0 ₽
-  - ✅ Added fallback handling (|| 0) for undefined/null payment amounts
-  - ✅ Clean aggregated view for better clarity
-
-- **2025-11-19**: Implemented architect role isolation - schools managed only in dedicated admin panel
-  - ✅ Removed "Школы" tab from Dashboard - architect sees same interface as other roles when working in a school
-  - ✅ Added "Управление школами" button in Dashboard header for architects
-  - ✅ Implemented clearSchool() method in AuthContext to navigate back to SchoolSelector
-  - ✅ Architect workflow: SchoolSelector (admin panel) ↔ Dashboard (per-school interface)
-  - ✅ Fixed critical white-screen bug in client management
-  - ✅ Resolved Radix UI Select crash caused by empty manager values
-  - ✅ Enhanced AddClientDialog.tsx with smart manager field (Select or Input based on available managers)
-  - ✅ Fixed EditClientDialog prop types and TypeScript typings
-
-- **2025-11-18**: Full stack setup with external PostgreSQL completed
-  - ✅ Configured Vite for Replit (port 5000, host 0.0.0.0, allowedHosts)
-  - ✅ Created Frontend workflow
-  - ✅ Connected to external PostgreSQL server (194.87.215.84)
-  - ✅ Created dedicated schema `payment_tracking` for project isolation
-  - ✅ Configured Backend workflow (port 3001)
-  - ✅ Initialized database schema (5 tables in payment_tracking schema)
-  - ✅ Implemented search_path approach for schema resolution (simpler than schema-qualified queries)
-  - ✅ Fixed SQL syntax errors in server.js (incorrect quote usage in template literals)
-  - ✅ Removed UNIQUE constraint on email field to support multi-role functionality
-  - ✅ Created Architect user account (sochneva.anastasiya@gmail.com / qwertyasd)
-  - ✅ Configured Vite proxy for API routing
-  - ✅ Updated env.ts for development mode detection
-  - ✅ Added TypeScript definitions for Vite environment
-  - ✅ Verified full stack integration (frontend ↔ backend ↔ external database)
-  - ✅ Tested multi-role support (one email with multiple roles in different schools)
-
-## Project Status
-✅ Frontend running (React + Vite)
-✅ Backend running (Node.js + Express)
-✅ Database connected (PostgreSQL)
-✅ Full stack integration working
-✅ User authentication functional
-✅ All UI components operational
-
-## Deployment
-Ready to deploy as a static frontend application or configure backend for full functionality.
+## External Dependencies
+- **PostgreSQL Database**: Hosted on an external server (194.87.215.84), database `data_vrassrochki`, using schema `payment_tracking`.
+- **Node.js/Express**: Backend server.
+- **React**: Frontend library.
+- **Vite**: Build tool for the frontend.
+- **TypeScript**: Superset of JavaScript for type-safety.
+- **Tailwind CSS**: Utility-first CSS framework.
+- **Radix UI**: Unstyled component library.
+- **shadcn/ui**: Components built with Radix UI and Tailwind CSS.
+- **Recharts**: Charting library for analytics.
+- **React Hook Form**: Form management library.

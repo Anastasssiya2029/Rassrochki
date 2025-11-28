@@ -32,6 +32,14 @@ const formatDateLong = (date: Date) => {
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
 
+const formatAmountShort = (amount: number) => {
+  if (amount >= 1000) {
+    const k = amount / 1000;
+    return k % 1 === 0 ? `${k}k` : `${k.toFixed(1)}k`;
+  }
+  return amount.toString();
+};
+
 const isSameDay = (date1: Date, date2: Date) => {
   return date1.getDate() === date2.getDate() &&
          date1.getMonth() === date2.getMonth() &&
@@ -244,18 +252,20 @@ export function PaymentCalendar({
                                 <>
                                   <div className="text-[10px] sm:text-xs">
                                     <p className="text-[#2D1B69] font-medium truncate">
-                                      {totalExpected.toLocaleString('ru-RU')} ₽
+                                      <span className="sm:hidden">{formatAmountShort(totalExpected)}</span>
+                                      <span className="hidden sm:inline">{totalExpected.toLocaleString('ru-RU')} ₽</span>
                                     </p>
-                                    <p className="text-[#263238]/70 text-[8px] sm:text-xs">
-                                      Ожид.
+                                    <p className="text-[#263238]/70 text-[8px] sm:text-xs hidden sm:block">
+                                      Ожидается
                                     </p>
                                   </div>
                                   <div className="text-[10px] sm:text-xs">
                                     <p className="text-green-600 font-medium truncate">
-                                      {paidTotal.toLocaleString('ru-RU')} ₽
+                                      <span className="sm:hidden">{formatAmountShort(paidTotal)}</span>
+                                      <span className="hidden sm:inline">{paidTotal.toLocaleString('ru-RU')} ₽</span>
                                     </p>
-                                    <p className="text-green-600/70 text-[8px] sm:text-xs">
-                                      Опл.
+                                    <p className="text-green-600/70 text-[8px] sm:text-xs hidden sm:block">
+                                      Оплачено
                                     </p>
                                   </div>
                                 </>

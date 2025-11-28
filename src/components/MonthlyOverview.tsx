@@ -106,7 +106,7 @@ export function MonthlyOverview({ clients }: MonthlyOverviewProps) {
         }}
         className="bg-white rounded-3xl shadow-3d hover:shadow-3d-hover transition-all duration-500 p-4 sm:p-6 lg:p-8 gpu-accelerated"
       >
-        <h2 className="text-[#2D1B69] font-semibold mb-4 sm:mb-6 text-lg sm:text-xl lg:text-2xl">Ожидаем в этом и следующем месяце</h2>
+        <h2 className="text-[#2D1B69] font-semibold mb-4 sm:mb-6 text-xl sm:text-xl lg:text-2xl">Ожидаем в этом и следующем месяце</h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           {/* Current Month - 3D Card */}

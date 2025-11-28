@@ -157,7 +157,7 @@ export function PaymentCalendar({
         <div className="p-3 sm:p-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-[#2D1B69] font-semibold text-sm sm:text-base">
+            <h2 className="text-[#2D1B69] font-semibold text-lg sm:text-xl lg:text-2xl">
               {getMonthName(currentMonth)}
             </h2>
             <div className="flex gap-1 sm:gap-2">

@@ -60,7 +60,7 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
     <div className="bg-white rounded-3xl shadow-3d hover:shadow-3d-hover transition-all duration-500">
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <h3 className="text-[#2D1B69] font-semibold text-base sm:text-lg">Обзор платежей на год</h3>
+          <h2 className="text-[#2D1B69] font-semibold text-lg sm:text-xl lg:text-2xl">Обзор платежей на год</h2>
           <div className="flex items-center gap-4 sm:gap-6 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg shadow-sm" />

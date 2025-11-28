@@ -12,9 +12,18 @@ const getMonthName = (date: Date) => {
   return months[date.getMonth()];
 };
 
+interface MonthData {
+  date: Date;
+  totalAmount: number;
+  paidAmount: number;
+  count: number;
+  paidCount: number;
+  percentage: number;
+}
+
 export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
   const monthsData = useMemo(() => {
-    const data = [];
+    const data: MonthData[] = [];
     const today = new Date();
     
     for (let i = 0; i < 12; i++) {
@@ -74,8 +83,8 @@ export function YearlyOverview({ clients, onMonthClick }: YearlyOverviewProps) {
         </div>
         
         {/* Horizontal scroll wrapper for mobile */}
-        <div className="overflow-x-auto scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 scroll-fade-right relative">
-          <div className="grid grid-cols-12 gap-2 sm:gap-3 min-w-[800px] sm:min-w-0">
+        <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+          <div className="grid grid-cols-12 gap-2 sm:gap-3 min-w-[700px] sm:min-w-0">
             {monthsData.map((month, index) => {
               const heightPercentage = (month.totalAmount / maxAmount) * 100;
               const paidHeightPercentage = (month.paidAmount / maxAmount) * 100;

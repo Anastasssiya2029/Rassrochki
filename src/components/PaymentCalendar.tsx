@@ -334,10 +334,6 @@ export function PaymentCalendar({
               <span className="text-xs sm:text-sm">🙏</span>
               <span className="text-[#263238]/70 font-semibold">Перенесен</span>
             </div>
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-lg ring-2 ring-purple-600" />
-              <span className="text-[#263238]/70 font-semibold">Сегодня</span>
-            </div>
           </div>
         </div>
       </div>

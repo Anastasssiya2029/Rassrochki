@@ -79,9 +79,7 @@ export function PaymentCalendar({
   const monthStart = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
   const monthEnd = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
   
-  // Get the day of week (0 = Sunday, 1 = Monday, etc.)
   const firstDayOfWeek = monthStart.getDay();
-  // Convert to Monday-based (0 = Monday, 6 = Sunday)
   const startDayOffset = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
   
   const calendarStart = new Date(monthStart);
@@ -150,57 +148,6 @@ export function PaymentCalendar({
   };
 
   const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  
-  // Group calendar days into weeks for horizontal mobile layout
-  const weeks: Date[][] = [];
-  for (let i = 0; i < calendarDays.length; i += 7) {
-    weeks.push(calendarDays.slice(i, i + 7));
-  }
-
-  // Render a single day cell (reusable for both layouts)
-  const renderDayCell = (day: Date, isMobile: boolean = false) => {
-    const payments = getPaymentsForDay(day);
-    const isCurrentMonth = isSameMonth(day, currentMonth);
-    const isToday = isSameDay(day, new Date());
-    const hasPaidPayments = payments.some(p => p.payment.paid);
-    const hasUnpaidPayments = payments.some(p => !p.payment.paid);
-    const hasPostponedPayments = payments.some(p => p.payment.originalDate);
-
-    const totalExpected = payments.reduce((sum, p) => sum + (p.payment.amount || 0), 0);
-    const paidTotal = payments.filter(p => p.payment.paid).reduce((sum, p) => sum + (p.payment.amount || 0), 0);
-
-    return (
-      <div
-        onClick={() => handleDayClick(day)}
-        className={`
-          ${isMobile ? 'min-w-[70px] min-h-[60px]' : 'min-h-16 sm:min-h-24'} p-1 sm:p-3 transition-all duration-300 cursor-pointer
-          border border-dashed border-purple-300/50
-          ${!isCurrentMonth ? 'bg-purple-50/30 opacity-40' : 'bg-white/50'}
-          ${isToday ? 'ring-2 ring-purple-600 bg-purple-100/30 shadow-lg shadow-purple-300/20 border-solid border-purple-400/50' : ''}
-          ${payments.length > 0 ? 'hover:shadow-xl hover:scale-[1.02] hover:ring-2 hover:ring-purple-300/50 hover:border-solid hover:border-purple-300/50 hover:z-10' : 'hover:bg-purple-50/50'}
-        `}
-      >
-        <div className="flex justify-between items-start mb-0.5">
-          <span className={`text-xs ${isToday ? 'text-purple-600 font-bold' : 'text-[#2D1B69]'}`}>
-            {day.getDate()}
-          </span>
-          {payments.length > 0 && (
-            <div className="flex gap-0.5 items-center">
-              {hasPostponedPayments && <span className="text-[8px]">🙏</span>}
-              {hasPaidPayments && <div className="w-1.5 h-1.5 rounded-full bg-green-500" />}
-              {hasUnpaidPayments && <div className="w-1.5 h-1.5 rounded-full bg-purple-600" />}
-            </div>
-          )}
-        </div>
-        {payments.length > 0 && (
-          <div className="space-y-0.5">
-            <p className="text-[#2D1B69] font-medium text-[9px] truncate">{formatAmountShort(totalExpected)}</p>
-            <p className="text-green-600 font-medium text-[9px] truncate">{formatAmountShort(paidTotal)}</p>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   return (
     <>
@@ -239,41 +186,11 @@ export function PaymentCalendar({
             </div>
           </div>
 
-          {/* Mobile Calendar - Horizontal scroll, weekdays as first column */}
-          <div className="sm:hidden overflow-x-auto -mx-3 px-3">
-            <div className="inline-flex">
-              {/* Weekday labels column */}
-              <div className="flex flex-col sticky left-0 z-10 bg-white/95">
-                <div className="h-[28px]" /> {/* Empty header cell */}
-                {weekDays.map(day => (
-                  <div key={day} className="min-h-[60px] w-10 flex items-center justify-center text-[#263238]/70 font-semibold text-xs border-r border-purple-200/50 bg-purple-50/50">
-                    {day}
-                  </div>
-                ))}
-              </div>
-              {/* Week columns */}
-              {weeks.map((week, weekIndex) => (
-                <div key={weekIndex} className="flex flex-col">
-                  {/* Week number header */}
-                  <div className="h-[28px] flex items-center justify-center text-[10px] text-[#263238]/50 border-b border-purple-200/50">
-                    Нед {weekIndex + 1}
-                  </div>
-                  {/* Days in this week */}
-                  {week.map((day, dayIndex) => (
-                    <div key={dayIndex}>
-                      {renderDayCell(day, true)}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Desktop Calendar Grid - Traditional 7-column layout */}
-          <div className="hidden sm:grid grid-cols-7 gap-0">
+          {/* Calendar Grid - Single unified layout for both mobile and desktop */}
+          <div className="grid grid-cols-7 gap-0">
             {/* Week Day Headers */}
             {weekDays.map(day => (
-              <div key={day} className="text-center py-2 text-[#263238]/70 font-semibold border-b-2 border-dashed border-purple-300/60 text-sm">
+              <div key={day} className="text-center py-1 sm:py-2 text-[#263238]/70 font-semibold border-b-2 border-dashed border-purple-300/60 text-xs sm:text-sm">
                 {day}
               </div>
             ))}
@@ -288,7 +205,6 @@ export function PaymentCalendar({
                 const hasPaidPayments = payments.some(p => p.payment.paid);
                 const hasUnpaidPayments = payments.some(p => !p.payment.paid);
                 const hasPostponedPayments = payments.some(p => p.payment.originalDate);
-                const hasPrepayments = payments.some(p => p.isPrepayment);
 
                 return (
                   <Tooltip key={index}>
@@ -296,7 +212,7 @@ export function PaymentCalendar({
                       <div
                         onClick={() => handleDayClick(day)}
                         className={`
-                          min-h-16 sm:min-h-24 p-1 sm:p-3 transition-all duration-300 cursor-pointer
+                          min-h-14 sm:min-h-24 p-1 sm:p-3 transition-all duration-300 cursor-pointer
                           border border-dashed border-purple-300/50
                           ${!isCurrentMonth ? 'bg-purple-50/30 opacity-40' : 'bg-white/50'}
                           ${isToday ? 'ring-2 ring-purple-600 bg-purple-100/30 shadow-lg shadow-purple-300/20 border-solid border-purple-400/50' : ''}
@@ -304,12 +220,12 @@ export function PaymentCalendar({
                         `}
                       >
                         <div className="flex justify-between items-start mb-0.5 sm:mb-1">
-                          <span className={`text-xs sm:text-sm ${isToday ? 'text-purple-600' : 'text-[#2D1B69]'}`}>
+                          <span className={`text-xs sm:text-sm ${isToday ? 'text-purple-600 font-bold' : 'text-[#2D1B69]'}`}>
                             {day.getDate()}
                           </span>
                           {payments.length > 0 && (
                             <div className="flex gap-0.5 sm:gap-1 items-center flex-wrap">
-                              {hasPostponedPayments && <span className="text-[10px] sm:text-xs">🙏</span>}
+                              {hasPostponedPayments && <span className="text-[8px] sm:text-xs">🙏</span>}
                               {hasPaidPayments && (
                                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
                               )}
@@ -409,21 +325,21 @@ export function PaymentCalendar({
           </div>
 
           {/* Legend */}
-          <div className="mt-6 pt-4 border-t border-purple-200/50 flex items-center gap-6 flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
+          <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-purple-200/50 flex items-center gap-3 sm:gap-6 flex-wrap text-xs sm:text-sm">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />
               <span className="text-[#263238]/70 font-semibold">Оплачено</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-600 shadow-sm shadow-purple-600/50" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-purple-600 shadow-sm shadow-purple-600/50" />
               <span className="text-[#263238]/70 font-semibold">Ожидается</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span>🙏</span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="text-xs sm:text-sm">🙏</span>
               <span className="text-[#263238]/70 font-semibold">Перенесен</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-lg ring-2 ring-purple-600" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-lg ring-2 ring-purple-600" />
               <span className="text-[#263238]/70 font-semibold">Сегодня</span>
             </div>
           </div>

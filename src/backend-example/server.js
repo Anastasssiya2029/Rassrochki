@@ -13,28 +13,19 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Rate limiting для защиты от брутфорса
+// Rate limiting для защиты от брутфорса на auth endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 минут
   max: 5, // Максимум 5 попыток за окно
   message: { message: 'Слишком много попыток. Попробуйте через 15 минут.' },
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: true, // Не считать успешные запросы
-});
-
-const generalLimiter = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 минута
-  max: 100, // Максимум 100 запросов в минуту
-  message: { message: 'Слишком много запросов. Попробуйте позже.' },
-  standardHeaders: true,
-  legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
 });
 
 // Middleware
 app.use(cors());
-app.use(express.json());
-app.use(generalLimiter); // Общее ограничение для всех запросов
+app.use(express.json({ limit: '10kb' })); // Ограничение размера тела запроса
 
 // PostgreSQL Connection
 const pool = new Pool({
@@ -70,7 +61,11 @@ pool.query('SHOW search_path').then(result => {
   console.error('Failed to check search_path:', err);
 });
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-key-change-this';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL: JWT_SECRET environment variable is required');
+  process.exit(1);
+}
 
 // Middleware для проверки токена
 const authenticateToken = (req, res, next) => {
@@ -94,17 +89,24 @@ const authenticateToken = (req, res, next) => {
 
 // Валидация email
 const isValidEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  if (typeof email !== 'string') return false;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return email.length <= 255 && emailRegex.test(email.trim());
 };
 
-// Валидация пароля (минимум 6 символов)
+// Валидация пароля (минимум 6 символов, максимум 128)
 const isValidPassword = (password) => {
-  return typeof password === 'string' && password.length >= 6;
+  return typeof password === 'string' && password.length >= 6 && password.length <= 128;
 };
 
-// Санитизация строки
-const sanitizeString = (str) => {
+// Санитизация email
+const sanitizeEmail = (email) => {
+  if (typeof email !== 'string') return '';
+  return email.trim().toLowerCase().slice(0, 255);
+};
+
+// Санитизация имени (без truncation для паролей)
+const sanitizeName = (str) => {
   if (typeof str !== 'string') return '';
   return str.trim().slice(0, 255);
 };
@@ -120,18 +122,18 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     return res.status(400).json({ message: 'Некорректный email' });
   }
   if (!password || !isValidPassword(password)) {
-    return res.status(400).json({ message: 'Пароль должен содержать минимум 6 символов' });
+    return res.status(400).json({ message: 'Пароль должен быть от 6 до 128 символов' });
   }
-  if (!name || sanitizeString(name).length < 2) {
+  if (!name || sanitizeName(name).length < 2) {
     return res.status(400).json({ message: 'Имя должно содержать минимум 2 символа' });
   }
-  if (!schoolName || sanitizeString(schoolName).length < 2) {
+  if (!schoolName || sanitizeName(schoolName).length < 2) {
     return res.status(400).json({ message: 'Название школы должно содержать минимум 2 символа' });
   }
 
-  const sanitizedEmail = sanitizeString(email).toLowerCase();
-  const sanitizedName = sanitizeString(name);
-  const sanitizedSchoolName = sanitizeString(schoolName);
+  const sanitizedEmailVal = sanitizeEmail(email);
+  const sanitizedNameVal = sanitizeName(name);
+  const sanitizedSchoolName = sanitizeName(schoolName);
 
   try {
     // Multi-role поддержка: не проверяем уникальность email
@@ -150,7 +152,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
     // Создаем пользователя-администратора
     const userResult = await pool.query(
       `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id`,
-      [sanitizedEmail, hashedPassword, sanitizedName, 'admin', school.id]
+      [sanitizedEmailVal, hashedPassword, sanitizedNameVal, 'admin', school.id]
     );
     const user = userResult.rows[0];
 
@@ -194,13 +196,13 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
     return res.status(400).json({ message: 'Пароль обязателен' });
   }
 
-  const sanitizedEmail = sanitizeString(email).toLowerCase();
+  const sanitizedEmailVal = sanitizeEmail(email);
 
   try {
     // Находим всех пользователей с данным email
     const result = await pool.query(
       `SELECT * FROM ${table('users')} WHERE email = $1`,
-      [sanitizedEmail]
+      [sanitizedEmailVal]
     );
 
     if (result.rows.length === 0) {
@@ -372,16 +374,31 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
 
-    // Multi-role поддержка: не проверяем уникальность email
-    // Пользователь может быть admin нескольких школ
-    
+    // Валидация входных данных
+    if (!schoolName || sanitizeName(schoolName).length < 2) {
+      return res.status(400).json({ message: 'Название школы должно содержать минимум 2 символа' });
+    }
+    if (!adminName || sanitizeName(adminName).length < 2) {
+      return res.status(400).json({ message: 'Имя администратора должно содержать минимум 2 символа' });
+    }
+    if (!adminEmail || !isValidEmail(adminEmail)) {
+      return res.status(400).json({ message: 'Некорректный email администратора' });
+    }
+    if (!adminPassword || !isValidPassword(adminPassword)) {
+      return res.status(400).json({ message: 'Пароль должен быть от 6 до 128 символов' });
+    }
+
+    const sanitizedSchoolName = sanitizeName(schoolName);
+    const sanitizedAdminName = sanitizeName(adminName);
+    const sanitizedAdminEmail = sanitizeEmail(adminEmail);
+
     await pool.query('BEGIN');
 
     try {
       // Создаем школу
       const schoolResult = await pool.query(
         `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *`,
-        [schoolName]
+        [sanitizedSchoolName]
       );
       const school = schoolResult.rows[0];
 
@@ -391,7 +408,7 @@ app.post('/api/schools', authenticateToken, async (req, res) => {
       // Создаем администратора школы
       const adminResult = await pool.query(
         `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id`,
-        [adminEmail, hashedPassword, adminName, 'admin', school.id]
+        [sanitizedAdminEmail, hashedPassword, sanitizedAdminName, 'admin', school.id]
       );
       const admin = adminResult.rows[0];
 
@@ -434,6 +451,17 @@ app.put('/api/schools/:schoolId', authenticateToken, async (req, res) => {
       return res.status(403).json({ message: 'Доступ запрещен' });
     }
 
+    // Валидация входных данных (если указаны)
+    if (adminName && sanitizeName(adminName).length < 2) {
+      return res.status(400).json({ message: 'Имя администратора должно содержать минимум 2 символа' });
+    }
+    if (adminEmail && !isValidEmail(adminEmail)) {
+      return res.status(400).json({ message: 'Некорректный email администратора' });
+    }
+    if (adminPassword && !isValidPassword(adminPassword)) {
+      return res.status(400).json({ message: 'Пароль должен быть от 6 до 128 символов' });
+    }
+
     // Проверяем, существует ли школа
     const schoolResult = await pool.query(
       `SELECT * FROM ${table('schools')} WHERE id = $1`,
@@ -455,12 +483,13 @@ app.put('/api/schools/:schoolId', authenticateToken, async (req, res) => {
     }
 
     const admin = adminResult.rows[0];
+    const sanitizedAdminEmail = adminEmail ? sanitizeEmail(adminEmail) : null;
 
     // Если email изменился, проверяем что новый email не занят
-    if (adminEmail && adminEmail !== admin.email) {
+    if (sanitizedAdminEmail && sanitizedAdminEmail !== admin.email) {
       const existingUser = await pool.query(
         `SELECT * FROM ${table('users')} WHERE email = $1 AND id != $2`,
-        [adminEmail, admin.id]
+        [sanitizedAdminEmail, admin.id]
       );
 
       if (existingUser.rows.length > 0) {
@@ -475,12 +504,12 @@ app.put('/api/schools/:schoolId', authenticateToken, async (req, res) => {
 
     if (adminName) {
       updateFields.push(`name = $${paramIndex++}`);
-      updateValues.push(adminName);
+      updateValues.push(sanitizeName(adminName));
     }
 
-    if (adminEmail) {
+    if (sanitizedAdminEmail) {
       updateFields.push(`email = $${paramIndex++}`);
-      updateValues.push(adminEmail);
+      updateValues.push(sanitizedAdminEmail);
     }
 
     if (adminPassword) {

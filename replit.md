@@ -3,6 +3,9 @@
 ## Overview
 This project is an interactive payment tracking and installment management service designed for online schools. Its primary purpose is to help educational institutions monitor client payments, manage installment schedules, and effectively handle overdue payments. The system aims to streamline financial operations, improve client relationship management, and provide clear visibility into payment statuses.
 
+**Target Domain**: vn-rassrochki.ru
+**GitHub Repository**: https://github.com/Anastasssiya2029/Rassrochki
+
 ## User Preferences
 I prefer iterative development with clear, concise explanations. Please ask before making major architectural changes or introducing new external dependencies. Focus on delivering robust, production-ready code.
 
@@ -13,7 +16,12 @@ The system is a full-stack application with a Node.js/Express backend and a Post
 **Technical Implementations and System Design:**
 - **Frontend**: React + Vite + TypeScript, Tailwind CSS, Radix UI, Recharts, React Hook Form.
 - **Backend**: Node.js + Express, PostgreSQL.
-- **Authentication**: JWT-based authentication system.
+- **Authentication**: JWT-based authentication system with secure password hashing (bcrypt).
+- **Security Features**:
+    - Rate limiting for auth endpoints (5 attempts per 15 minutes)
+    - Input validation and sanitization
+    - SSL database connection
+    - JWT tokens with 7-day expiration
 - **Database Schema**: Dedicated `payment_tracking` schema with tables for `schools`, `users`, `clients`, `payments`, and `overdue_history`.
 - **Multi-Role Support**: Designed to support multiple user roles (Architect, Admin, Manager, Assistant) per email address across different schools. The `email` field does not have a `UNIQUE` constraint to facilitate this. Each user record is unique by (`email` + `role` + `school_id`).
 - **Schema Resolution**: Utilizes PostgreSQL `search_path` for automatic schema resolution, setting `search_path = payment_tracking, public` on connection to allow unqualified table names in queries.
@@ -27,9 +35,12 @@ The system is a full-stack application with a Node.js/Express backend and a Post
     - Multi-school Management (for Architect role)
     - Role-based Access Control
 
+## Deployment
+See `DEPLOY_VPS.md` for detailed VPS deployment instructions.
+
 ## External Dependencies
 - **PostgreSQL Database**: Hosted on an external server (194.87.215.84), database `data_vrassrochki`, using schema `payment_tracking`.
-- **Node.js/Express**: Backend server.
+- **Node.js/Express**: Backend server with express-rate-limit for security.
 - **React**: Frontend library.
 - **Vite**: Build tool for the frontend.
 - **TypeScript**: Superset of JavaScript for type-safety.
@@ -38,3 +49,9 @@ The system is a full-stack application with a Node.js/Express backend and a Post
 - **shadcn/ui**: Components built with Radix UI and Tailwind CSS.
 - **Recharts**: Charting library for analytics.
 - **React Hook Form**: Form management library.
+
+## Recent Changes
+- 2025-12-05: Added rate limiting and input validation for security
+- 2025-12-05: Removed all mock data, connected to real PostgreSQL database
+- 2025-12-05: Created VPS deployment documentation
+- 2025-12-05: Added .env.example file for configuration

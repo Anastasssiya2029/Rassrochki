@@ -1,10 +1,9 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { useAuth, MOCK_SCHOOLS } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Building2, ChevronRight, Settings } from 'lucide-react';
 import { SchoolManagement } from './SchoolManagement';
 import { apiService } from '../services/api';
-import { useMockApi } from '../utils/env';
 import { toast } from 'sonner';
 
 interface School {
@@ -20,7 +19,6 @@ export function SchoolSelector() {
   const [activeTab, setActiveTab] = useState<'select' | 'manage'>('select');
   const [schools, setSchools] = useState<School[]>([]);
   const [loading, setLoading] = useState(true);
-  const USE_MOCK_API = useMockApi();
 
   // Generate symbols once
   const backgroundSymbols = useMemo(() => {
@@ -54,14 +52,8 @@ export function SchoolSelector() {
   const loadSchools = async () => {
     try {
       setLoading(true);
-      if (USE_MOCK_API) {
-        // Используем моковые данные
-        setSchools(MOCK_SCHOOLS);
-      } else {
-        // Загружаем из API
-        const response = await apiService.getSchools();
-        setSchools(response.schools || []);
-      }
+      const response = await apiService.getSchools();
+      setSchools(response.schools || []);
     } catch (error) {
       console.error('Ошибка загрузки школ:', error);
       toast.error('Не удалось загрузить список школ');
@@ -77,28 +69,11 @@ export function SchoolSelector() {
     adminPassword: string;
   }) => {
     try {
-      if (USE_MOCK_API) {
-        // Моковое добавление
-        const newSchool: School = {
-          id: Date.now().toString(),
-          name: schoolData.schoolName,
-          createdAt: new Date(),
-          adminName: schoolData.adminName,
-          adminEmail: schoolData.adminEmail,
-        };
-        setSchools([...schools, newSchool]);
-        toast.success(`Школа "${schoolData.schoolName}" успешно создана`, {
-          description: `Администратор: ${schoolData.adminName}`
-        });
-      } else {
-        // Реальное API
-        const response = await apiService.createSchool(schoolData);
-        await loadSchools(); // Перезагружаем список
-        toast.success(`Школа "${schoolData.schoolName}" успешно создана`, {
-          description: `Администратор: ${schoolData.adminName}`
-        });
-      }
-      // Переключаемся на вкладку выбора школы после создания
+      await apiService.createSchool(schoolData);
+      await loadSchools();
+      toast.success(`Школа "${schoolData.schoolName}" успешно создана`, {
+        description: `Администратор: ${schoolData.adminName}`
+      });
       setActiveTab('select');
     } catch (error: any) {
       console.error('Ошибка создания школы:', error);
@@ -115,26 +90,9 @@ export function SchoolSelector() {
     adminPassword?: string;
   }) => {
     try {
-      if (USE_MOCK_API) {
-        // Моковое редактирование
-        setSchools(schools.map(school => {
-          if (school.id === schoolId) {
-            return {
-              ...school,
-              name: data.schoolName || school.name,
-              adminName: data.adminName || school.adminName,
-              adminEmail: data.adminEmail || school.adminEmail,
-            };
-          }
-          return school;
-        }));
-        toast.success('Данные владельца школы успешно обновлены');
-      } else {
-        // Реальное API
-        await apiService.updateSchool(schoolId, data);
-        await loadSchools(); // Перезагружаем список
-        toast.success('Данные владельца школы успешно обновлены');
-      }
+      await apiService.updateSchool(schoolId, data);
+      await loadSchools();
+      toast.success('Данные владельца школы успешно обновлены');
     } catch (error: any) {
       console.error('Ошибка обновления школы:', error);
       toast.error('Не удалось обновить данные', {
@@ -145,18 +103,10 @@ export function SchoolSelector() {
 
   const handleDeleteSchool = async (schoolId: string) => {
     try {
-      if (USE_MOCK_API) {
-        // Моковое удаление
-        const schoolToDelete = schools.find(s => s.id === schoolId);
-        setSchools(schools.filter(school => school.id !== schoolId));
-        toast.success(`Школа "${schoolToDelete?.name}" успешно удалена`);
-      } else {
-        // Реальное API
-        const schoolToDelete = schools.find(s => s.id === schoolId);
-        await apiService.deleteSchool(schoolId);
-        await loadSchools(); // Перезагружаем список
-        toast.success(`Школа "${schoolToDelete?.name}" успешно удалена`);
-      }
+      const schoolToDelete = schools.find(s => s.id === schoolId);
+      await apiService.deleteSchool(schoolId);
+      await loadSchools();
+      toast.success(`Школа "${schoolToDelete?.name}" успешно удалена`);
     } catch (error: any) {
       console.error('Ошибка удаления школы:', error);
       toast.error('Не удалось удалить школу', {

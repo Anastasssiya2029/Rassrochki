@@ -4,38 +4,27 @@
 
 /**
  * Проверяет, подключен ли реальный API
- * @returns true если API подключен, false если используются моки
+ * @returns true - всегда используем реальный API
  */
 export const isApiConnected = (): boolean => {
-  // Если установлена переменная VITE_API_URL, используем её
-  if (import.meta.env.VITE_API_URL) {
-    return true;
-  }
-  // Иначе используем прокси Vite (в dev режиме backend доступен через /api)
-  return import.meta.env.MODE === 'development';
+  return true;
 };
 
 /**
- * Получает URL API или пустую строку для мокового режима
- * @returns URL API или пустая строка
+ * Получает URL API
+ * @returns URL API для прокси
  */
 export const getApiUrl = (): string => {
-  // Если явно указан URL API, используем его
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
-  // В dev режиме используем прокси (запросы к /api будут проксироваться на localhost:3001)
-  if (import.meta.env.MODE === 'development') {
-    return '/api';
-  }
-  // В остальных случаях моковый режим
-  return '';
+  return '/api';
 };
 
 /**
  * Проверяет, используется ли моковый API
- * @returns true если используются моки, false если реальный API
+ * @returns false - моки отключены
  */
 export const useMockApi = (): boolean => {
-  return !isApiConnected();
+  return false;
 };

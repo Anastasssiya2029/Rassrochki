@@ -4,7 +4,6 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { LogIn, Sparkles } from 'lucide-react';
-import { isApiConnected } from '../utils/env';
 
 interface LoginPageProps {
   onSwitchToRegister: () => void;
@@ -16,8 +15,6 @@ export function LoginPage({ onSwitchToRegister }: LoginPageProps) {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
-  
-  const apiConnected = isApiConnected();
 
   // Generate symbols once
   const backgroundSymbols = useMemo(() => {

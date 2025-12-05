@@ -1,5 +1,5 @@
 // Пример Node.js Express сервера для подключения к вашей PostgreSQL базе
-// Установите зависимости: npm install express pg bcrypt jsonwebtoken cors dotenv
+// Установите зависимости: npm install express pg bcrypt jsonwebtoken cors dotenv express-rate-limit
 
 const express = require('express');
 const { Pool } = require('pg');
@@ -7,14 +7,34 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const pgFormat = require('pg-format');
+const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Rate limiting для защиты от брутфорса
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 минут
+  max: 5, // Максимум 5 попыток за окно
+  message: { message: 'Слишком много попыток. Попробуйте через 15 минут.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true, // Не считать успешные запросы
+});
+
+const generalLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 минута
+  max: 100, // Максимум 100 запросов в минуту
+  message: { message: 'Слишком много запросов. Попробуйте позже.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(generalLimiter); // Общее ограничение для всех запросов
 
 // PostgreSQL Connection
 const pool = new Pool({
@@ -70,11 +90,48 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+// ==================== VALIDATION HELPERS ====================
+
+// Валидация email
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+// Валидация пароля (минимум 6 символов)
+const isValidPassword = (password) => {
+  return typeof password === 'string' && password.length >= 6;
+};
+
+// Санитизация строки
+const sanitizeString = (str) => {
+  if (typeof str !== 'string') return '';
+  return str.trim().slice(0, 255);
+};
+
 // ==================== AUTH ENDPOINTS ====================
 
-// Регистрация
-app.post('/api/auth/register', async (req, res) => {
+// Регистрация (с защитой от брутфорса)
+app.post('/api/auth/register', authLimiter, async (req, res) => {
   const { email, password, name, schoolName } = req.body;
+
+  // Валидация входных данных
+  if (!email || !isValidEmail(email)) {
+    return res.status(400).json({ message: 'Некорректный email' });
+  }
+  if (!password || !isValidPassword(password)) {
+    return res.status(400).json({ message: 'Пароль должен содержать минимум 6 символов' });
+  }
+  if (!name || sanitizeString(name).length < 2) {
+    return res.status(400).json({ message: 'Имя должно содержать минимум 2 символа' });
+  }
+  if (!schoolName || sanitizeString(schoolName).length < 2) {
+    return res.status(400).json({ message: 'Название школы должно содержать минимум 2 символа' });
+  }
+
+  const sanitizedEmail = sanitizeString(email).toLowerCase();
+  const sanitizedName = sanitizeString(name);
+  const sanitizedSchoolName = sanitizeString(schoolName);
 
   try {
     // Multi-role поддержка: не проверяем уникальность email
@@ -86,14 +143,14 @@ app.post('/api/auth/register', async (req, res) => {
     // Создаем школу
     const schoolResult = await pool.query(
       `INSERT INTO ${table('schools')} (name) VALUES ($1) RETURNING *`,
-      [schoolName]
+      [sanitizedSchoolName]
     );
     const school = schoolResult.rows[0];
 
     // Создаем пользователя-администратора
     const userResult = await pool.query(
       `INSERT INTO ${table('users')} (email, password_hash, name, role, school_id) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, name, role, school_id`,
-      [email, hashedPassword, name, 'admin', school.id]
+      [sanitizedEmail, hashedPassword, sanitizedName, 'admin', school.id]
     );
     const user = userResult.rows[0];
 
@@ -125,15 +182,25 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-// Вход
-app.post('/api/auth/login', async (req, res) => {
+// Вход (с защитой от брутфорса)
+app.post('/api/auth/login', authLimiter, async (req, res) => {
   const { email, password, roleId } = req.body;
+
+  // Валидация входных данных
+  if (!email || !isValidEmail(email)) {
+    return res.status(400).json({ message: 'Некорректный email' });
+  }
+  if (!password || typeof password !== 'string') {
+    return res.status(400).json({ message: 'Пароль обязателен' });
+  }
+
+  const sanitizedEmail = sanitizeString(email).toLowerCase();
 
   try {
     // Находим всех пользователей с данным email
     const result = await pool.query(
       `SELECT * FROM ${table('users')} WHERE email = $1`,
-      [email]
+      [sanitizedEmail]
     );
 
     if (result.rows.length === 0) {

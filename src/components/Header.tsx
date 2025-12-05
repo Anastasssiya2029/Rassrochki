@@ -1,8 +1,7 @@
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { LogOut, User, Building2, Shield, Database, ArrowLeft } from 'lucide-react';
-import { useMockApi } from '../utils/env';
-import { useState, useEffect } from 'react';
+import { LogOut, User, Building2, Shield, ArrowLeft } from 'lucide-react';
 
 const ROLE_LABELS = {
   architect: { label: 'Архитектор', icon: Shield, color: 'from-blue-500 via-purple-500 to-pink-500' },
@@ -13,7 +12,6 @@ const ROLE_LABELS = {
 
 export function Header() {
   const { user, school, logout } = useAuth();
-  const USE_MOCK_API = useMockApi();
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Задача #8 - Shrinking header при скролле
@@ -65,13 +63,6 @@ export function Header() {
               </>
             )}
             
-            {/* API Status Badge */}
-            {USE_MOCK_API && (
-              <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-yellow-50 rounded-xl border border-yellow-200 flex-shrink-0">
-                <Database className="w-4 h-4 text-yellow-600" />
-                <span className="text-yellow-700 text-xs">Demo Mode</span>
-              </div>
-            )}
           </div>
 
           {/* Right: User Info & Logout */}
